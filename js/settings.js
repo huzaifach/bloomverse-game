@@ -13,8 +13,10 @@ const Settings = {
         <button class="btn btn-soft btn-small" id="set-import">Import Save</button>
       </div>
       <div class="btn-row"><button class="btn btn-soft" id="set-reset" style="color:var(--danger)">Reset Greenhouse</button></div>
+      <div class="btn-row"><button class="btn btn-soft" id="set-how">❓ How to Play</button></div>
       <div class="btn-row"><button class="btn" id="set-close">Done</button></div>`);
     m.querySelector('#set-close').onclick = () => UI.closeModal();
+    m.querySelector('#set-how').onclick = () => { UI.closeModal(); UI.howTo(); };
     m.querySelector('#set-sound').onclick = e => { this.toggleSound(); e.target.classList.toggle('on'); };
     m.querySelector('#set-music').onclick = e => {
       S.save.settings.music = !S.save.settings.music;

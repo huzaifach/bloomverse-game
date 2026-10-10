@@ -58,18 +58,33 @@ body::after{top:16%;left:-140px;font-size:44px;animation-duration:70s;animation-
 .tab.active{background:#E7F6D8;color:#2E7D32;box-shadow:inset 0 0 0 2px #BEE39A}
 
 /* ---------- garden board ---------- */
-#packet-row{display:flex;gap:8px;margin-bottom:10px}
-.packet{flex:1;background:var(--card);border:3px solid rgba(74,59,42,.1);border-radius:var(--r);padding:6px 4px;text-align:center;
+#packet-row{display:flex;gap:8px;margin-bottom:10px;overflow-x:auto;padding:4px 2px 8px;scroll-snap-type:x mandatory;scrollbar-width:thin}
+.packet{flex:0 0 88px;scroll-snap-align:start;background:var(--card);border:3px solid rgba(74,59,42,.1);border-radius:var(--r);padding:6px 4px;text-align:center;
   cursor:pointer;box-shadow:var(--shadow);position:relative;transition:transform .12s;min-width:0}
 .packet:active{transform:scale(.94)}
 .packet img{width:44px;height:44px;object-fit:contain;animation:sway 3.2s ease-in-out infinite;transform-origin:50% 90%}
-.packet .pname{font-size:10px;font-weight:800;line-height:1.1;margin-top:2px}
+.packet .pname{font-size:10px;font-weight:800;line-height:1.1;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .packet .cost{display:inline-block;margin-top:3px;background:linear-gradient(180deg,#FFD968,#F5B93C);border-radius:999px;
-  font-size:12px;font-weight:800;padding:1px 9px;box-shadow:0 2px 0 #C98F1F;color:#5A3E0B}
+  font-size:12px;font-weight:800;padding:1px 9px;box-shadow:0 2px 0 #C98F1F;color:#5A3E0B;white-space:nowrap}
+.packet .ptier{font-size:10px;font-weight:800;color:var(--muted);white-space:nowrap}
 .packet.locked{filter:grayscale(.7);opacity:.75}
 .packet.cant{opacity:.75}
-#board-wrap{background:linear-gradient(180deg,#A4E87A,#8FE063);border:4px solid #5FAE3E;border-radius:26px;padding:12px;
+#board-wrap{background:
+  radial-gradient(circle at 15% 20%, rgba(255,255,255,.22), transparent 42%),
+  radial-gradient(circle at 85% 75%, rgba(46,110,32,.28), transparent 46%),
+  radial-gradient(circle at 60% 10%, rgba(255,255,200,.14), transparent 35%),
+  linear-gradient(180deg,#A9ED7F,#8CDC5F);
+  border:4px solid #5FAE3E;border-radius:26px;padding:12px;
   box-shadow:0 6px 0 rgba(63,120,40,.35), inset 0 2px 0 rgba(255,255,255,.4);position:relative;overflow:hidden}
+#board-wrap.grove{background:
+  radial-gradient(circle at 20% 15%, rgba(255,255,255,.35) 0 2px, transparent 3px),
+  radial-gradient(circle at 70% 40%, rgba(255,255,255,.3) 0 2px, transparent 3px),
+  radial-gradient(circle at 40% 80%, rgba(255,255,255,.25) 0 2px, transparent 3px),
+  radial-gradient(circle at 90% 85%, rgba(255,255,255,.3) 0 2px, transparent 3px),
+  linear-gradient(180deg,#4A3B8C,#2B2358);
+  border-color:#221B4D;box-shadow:0 6px 0 rgba(20,14,50,.5), inset 0 2px 0 rgba(255,255,255,.25)}
+#board-wrap.grove .cell{background:rgba(255,255,255,.09);box-shadow:inset 0 3px 6px rgba(10,8,30,.5), inset 0 -2px 0 rgba(255,255,255,.12)}
+#board-wrap.grove::before{content:'✨ 🌙 ✨';opacity:.7}
 #board-wrap::before{content:'🌼 🌸 🌼';position:absolute;top:6px;left:0;right:0;text-align:center;font-size:13px;opacity:.5;pointer-events:none;letter-spacing:14px}
 #grid{display:grid;gap:7px;position:relative;z-index:1;--n:4;grid-template-columns:repeat(var(--n),1fr)}
 .cell{aspect-ratio:1;background:var(--grass2);border-radius:15px;position:relative;box-shadow:inset 0 3px 6px rgba(46,110,32,.35), inset 0 -2px 0 rgba(255,255,255,.25);
@@ -135,8 +150,8 @@ body::after{top:16%;left:-140px;font-size:44px;animation-duration:70s;animation-
 #drag-ghost img{width:74px;height:74px;object-fit:contain}
 
 /* ---------- Pip companion ---------- */
-#pip{position:fixed;right:6px;bottom:78px;z-index:60;width:70px;text-align:center;cursor:pointer;pointer-events:none}
-#pip img{width:62px;height:62px;object-fit:contain;animation:pipBob 2.6s ease-in-out infinite;pointer-events:auto;will-change:transform}
+#pip{position:fixed;right:6px;bottom:78px;z-index:60;width:62px;text-align:center;cursor:pointer;pointer-events:none}
+#pip img{width:54px;height:54px;object-fit:contain;animation:pipBob 2.6s ease-in-out infinite;pointer-events:auto;will-change:transform}
 #pip-bubble{pointer-events:none}
 @keyframes pipBob{50%{transform:translateY(-9px) rotate(4deg)}}
 #pip-bubble{position:absolute;bottom:calc(100% + 4px);right:0;width:210px;background:#fff;border:3px solid #BEE39A;border-radius:16px;
@@ -290,4 +305,5 @@ body.reduced-motion *{animation-duration:.01s !important;transition-duration:.01
 .perk-card{cursor:pointer;min-width:110px;text-align:center}
 .perk-card:hover{transform:scale(1.05)}
 #garden-level{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
-.weather-pill{font-size:12px;font-weight:800;background:#E3F2FD;border-radius:99px;padding:4px 12px;border:2px solid #90CAF9}
+.xpbar{height:6px;background:rgba(0,0,0,.12);border-radius:99px;overflow:hidden;margin-top:3px;min-width:96px}
+.xpbar div{height:100%;background:linear-gradient(90deg,#9B5DE5,#6BCB77);border-radius:99px;transition:width .4s}

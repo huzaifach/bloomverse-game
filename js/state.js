@@ -66,6 +66,11 @@ const S = {
 
   solariumSlotCount(){ return 6 + (this.effect('solariumSlotsBonus', 0) || 0); },
 
+  /* Bloom Burst costs coins; every use gets a little more expensive */
+  burstCost(){
+    const uses = this.save.stats.bursts || 0;
+    return Math.max(10, Math.round(10 * this.gardenLevel() * Math.pow(1.12, uses)));
+  },
   /* V4: plants earn coins idly too — a tiny fraction of their sell value */
   coinPerSecond(){
     let r = 0;

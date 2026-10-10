@@ -22,6 +22,7 @@ const Board = {
     const n = this.size();
     const grid = document.getElementById('grid');
     grid.style.setProperty('--n', n);
+    document.getElementById('board-wrap').classList.toggle('grove', (S.save.activeGarden || 0) === 1);
     grid.innerHTML = '';
     for (let i = 0; i < n * n; i++){
       const cell = document.createElement('div');
@@ -68,17 +69,19 @@ const Board = {
       const wrap = document.getElementById('board-wrap');
       wrap.insertBefore(bar, wrap.firstChild);
     }
-    const burstCd = Math.max(0, Math.ceil(((S.save.bloomBurstAt || 0) + 90000 - Date.now()) / 1000));
-    const canBurst = burstCd <= 0 && this.findMergePair() !== -1;
+    const burstCost = S.burstCost();
+    const canBurst = S.save.coins >= burstCost && this.findMergePair() !== -1;
     const groveOpen = S.isGroveUnlocked();
     const ag = S.save.activeGarden || 0;
+    const merges = S.save.stats.merges || 0;
+    const xpPct = Math.round((merges % 20) / 20 * 100);
     bar.innerHTML = `<div class="garden-tabs">
         <button class="gtab${ag === 0 ? ' active' : ''}" data-g="0">☀️ Meadow</button>
         <button class="gtab${ag === 1 ? ' active' : ''}" data-g="1" ${groveOpen ? '' : 'disabled'}>🌙 Grove${groveOpen ? '' : ' 🔒'}</button>
       </div>
-      <div class="lvl">🌱 Garden Lv ${S.gardenLevel()}</div>
+      <div class="lvl">🌱 Garden Lv ${S.gardenLevel()}<div class="xpbar"><div style="width:${xpPct}%"></div></div></div>
       ${Weather.pillHTML()}
-      <button id="bloom-burst" ${canBurst ? '' : 'disabled'}>💥 Bloom Burst${burstCd > 0 ? ` (${burstCd}s)` : ''}</button>`;
+      <button id="bloom-burst" ${canBurst ? '' : 'disabled'}>💥 Burst 🪙${UI.fmt(burstCost)}</button>`;
     bar.querySelectorAll('.gtab').forEach(b => b.onclick = () => S.switchGarden(parseInt(b.dataset.g, 10)));
     const bb = document.getElementById('bloom-burst');
     if (canBurst) bb.onclick = () => this.bloomBurst();
@@ -431,7 +434,9 @@ const Board = {
 
   bloomBurst(){
     if (this.findMergePair() === -1){ UI.toast('No merges available right now.'); return; }
-    S.save.bloomBurstAt = Date.now();
+    const cost = S.burstCost();
+    if (S.save.coins < cost){ UI.toast('Not enough coins for Bloom Burst!'); Audio.sfx('error'); return; }
+    S.addCoins(-cost);
     S.save.stats.bursts = (S.save.stats.bursts || 0) + 1;
     Challenge.bump('bursts');
     Audio.sfx('fanfare');

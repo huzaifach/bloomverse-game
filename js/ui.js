@@ -14,7 +14,6 @@ const UI = {
       t.addEventListener('click', () => { Audio.unlock(); Audio.sfx('click'); this.switchTab(t.dataset.screen); });
     });
     document.getElementById('btn-sound').addEventListener('click', () => Settings.toggleSound());
-    document.getElementById('btn-help').addEventListener('click', () => this.howTo());
     document.getElementById('pill-coins').addEventListener('click', () => this.switchTab('haven'));
     document.getElementById('pill-dew').addEventListener('click', () => this.switchTab('solarium'));
     document.getElementById('pill-renown').addEventListener('click', () => this.switchTab('haven'));
