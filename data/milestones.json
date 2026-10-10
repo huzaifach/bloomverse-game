@@ -450,6 +450,231 @@
         "coins": 6000
       },
       "pip": "Twenty-five Bloom Bursts! Maximum sparkle achieved!"
+    },
+    {
+      "id": "ember-8",
+      "name": "Lord of Flames",
+      "desc": "Grow an Ember Blooms Tier 8",
+      "stat": "ember8",
+      "target": 1,
+      "reward": {
+        "coins": 8000
+      },
+      "pip": "A Phoenix Inferno! Even the sun is jealous!"
+    },
+    {
+      "id": "tidal-8",
+      "name": "Ocean Master",
+      "desc": "Grow a Tidal Kelps Tier 8",
+      "stat": "tidal8",
+      "target": 1,
+      "reward": {
+        "coins": 12000
+      },
+      "pip": "An Ocean Sovereign! The tides applaud!"
+    },
+    {
+      "id": "storm-8",
+      "name": "Storm Caller",
+      "desc": "Grow a Storm Petals Tier 8",
+      "stat": "storm8",
+      "target": 1,
+      "reward": {
+        "coins": 18000
+      },
+      "pip": "A Storm God Bloom! Thunder roars your name!"
+    },
+    {
+      "id": "honey-8",
+      "name": "Golden Keeper",
+      "desc": "Grow a Honey Blooms Tier 8",
+      "stat": "honey8",
+      "target": 1,
+      "reward": {
+        "coins": 25000,
+        "seeds": 3
+      },
+      "pip": "An Eternal Honey Bloom! Sweetest garden ever!"
+    },
+    {
+      "id": "grove-unlock",
+      "name": "Moonlit Steps",
+      "desc": "Unlock the Moonlit Grove",
+      "stat": "grove",
+      "target": 1,
+      "reward": {
+        "coins": 3000
+      },
+      "pip": "A second garden under the moon! Twice the magic!"
+    },
+    {
+      "id": "grove-8x8",
+      "name": "Twin Paradises",
+      "desc": "Expand the Grove to 8x8",
+      "stat": "groveMax",
+      "target": 1,
+      "reward": {
+        "coins": 10000
+      },
+      "pip": "Two full gardens! You are unstoppable!"
+    },
+    {
+      "id": "weather-4",
+      "name": "Child of Seasons",
+      "desc": "Experience all 4 weathers",
+      "stat": "weathers",
+      "target": 4,
+      "reward": {
+        "coins": 4000
+      },
+      "pip": "Sun, rain, wind and storm \u2014 you have seen them all!"
+    },
+    {
+      "id": "weeds-25",
+      "name": "Weed Whacker",
+      "desc": "Clear 25 weeds",
+      "stat": "weeds",
+      "target": 25,
+      "reward": {
+        "coins": 5000
+      },
+      "pip": "Twenty-five weeds cleared! Spotless!"
+    },
+    {
+      "id": "meteors-20",
+      "name": "Star Catcher",
+      "desc": "Tap 20 meteors",
+      "stat": "meteors",
+      "target": 20,
+      "reward": {
+        "coins": 4000
+      },
+      "pip": "Twenty shooting stars caught! Make a wish!"
+    },
+    {
+      "id": "frogs-3",
+      "name": "Frog Friend Forever",
+      "desc": "Welcome the frog 3 times",
+      "stat": "frogs",
+      "target": 3,
+      "reward": {
+        "coins": 3000
+      },
+      "pip": "Ribbit ribbit! The frog loves you!"
+    },
+    {
+      "id": "party-3",
+      "name": "Party Animal",
+      "desc": "Enjoy 3 dance parties",
+      "stat": "parties",
+      "target": 3,
+      "reward": {
+        "dewdrops": 3000
+      },
+      "pip": "Three dance parties! Best garden ever!"
+    },
+    {
+      "id": "rainbow-5",
+      "name": "Rainbow Chaser",
+      "desc": "See 5 rainbow rains",
+      "stat": "rainbows",
+      "target": 5,
+      "reward": {
+        "coins": 5000
+      },
+      "pip": "Five rainbows! Your luck is legendary!"
+    },
+    {
+      "id": "perks-3",
+      "name": "Blessed Thrice",
+      "desc": "Earn 3 rebirth blessings",
+      "stat": "perks",
+      "target": 3,
+      "reward": {
+        "coins": 6000
+      },
+      "pip": "Three blessings! The garden gods smile on you!"
+    },
+    {
+      "id": "merges-2500",
+      "name": "Merge Titan",
+      "desc": "Merge 2,500 times",
+      "stat": "merges",
+      "target": 2500,
+      "reward": {
+        "coins": 30000,
+        "seeds": 5
+      },
+      "pip": "Two thousand five hundred merges! TITAN!"
+    },
+    {
+      "id": "orders-250",
+      "name": "Town Favorite",
+      "desc": "Fulfill 250 orders",
+      "stat": "orders",
+      "target": 250,
+      "reward": {
+        "coins": 20000
+      },
+      "pip": "Two hundred fifty happy visitors! Incredible!"
+    },
+    {
+      "id": "grand-25",
+      "name": "Grand Legend",
+      "desc": "Fill 25 grand orders",
+      "stat": "grandOrders",
+      "target": 25,
+      "reward": {
+        "coins": 25000
+      },
+      "pip": "Twenty-five grand orders! Royalty material!"
+    },
+    {
+      "id": "level-75",
+      "name": "Garden Sage",
+      "desc": "Reach Garden Level 75",
+      "stat": "gardenLevel",
+      "target": 75,
+      "reward": {
+        "coins": 25000,
+        "seeds": 5
+      },
+      "pip": "Level 75! Sages travel miles to see your garden!"
+    },
+    {
+      "id": "level-100",
+      "name": "Centennial Bloom",
+      "desc": "Reach Garden Level 100",
+      "stat": "gardenLevel",
+      "target": 100,
+      "reward": {
+        "coins": 50000,
+        "seeds": 10
+      },
+      "pip": "LEVEL ONE HUNDRED! This is history!"
+    },
+    {
+      "id": "prestige-3",
+      "name": "Thrice Reborn",
+      "desc": "Perform 3 Rebirths",
+      "stat": "prestiges",
+      "target": 3,
+      "reward": {
+        "dewdrops": 15000
+      },
+      "pip": "Three rebirths! Every life more glorious!"
+    },
+    {
+      "id": "golden-25",
+      "name": "Midas Touch",
+      "desc": "Grow 25 golden plants",
+      "stat": "golden",
+      "target": 25,
+      "reward": {
+        "coins": 12000,
+        "seeds": 3
+      },
+      "pip": "Twenty-five golden plants! Everything you touch shines!"
     }
   ]
 }

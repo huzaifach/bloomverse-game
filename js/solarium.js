@@ -84,7 +84,7 @@ const Solarium = {
 
   eligibleParents(){
     const out = [];
-    S.save.board.forEach((p, i) => {
+    S.G().board.forEach((p, i) => {
       if (p && p.t >= 5) out.push({ i, p });
     });
     return out;
@@ -117,7 +117,7 @@ const Solarium = {
     m.querySelector('#hyb-fuse').onclick = () => {
       const picks = [...m.querySelectorAll('[data-pick]:checked')].map(c => parseInt(c.dataset.pick, 10));
       if (picks.length !== 2){ UI.toast('Pick exactly two plants!'); return; }
-      const a = S.save.board[picks[0]], b = S.save.board[picks[1]];
+      const a = S.G().board[picks[0]], b = S.G().board[picks[1]];
       if (!a || !b || a.f === b.f){ UI.toast('Parents must be from two different families!'); return; }
       UI.closeModal();
       this.doFuse(slotIx, picks[0], picks[1]);
@@ -125,7 +125,7 @@ const Solarium = {
   },
 
   doFuse(slotIx, ia, ib){
-    const a = S.save.board[ia], b = S.save.board[ib];
+    const a = S.G().board[ia], b = S.G().board[ib];
     if (!a || !b) return;
     const ta = S.tierOf(a.f, a.t), tb = S.tierOf(b.f, b.t);
     const dew = Math.round(((ta.dewPerSec + tb.dewPerSec) * 1.5) * 10) / 10;
@@ -136,7 +136,7 @@ const Solarium = {
       baseF: a.f, baseT: Math.min(a.t, b.t), hue, dewPerSec: dew,
       parents: [ta.name, tb.name], bornAt: Date.now()
     };
-    S.save.board[ia] = null; S.save.board[ib] = null;
+    S.G().board[ia] = null; S.G().board[ib] = null;
     S.save.hybrids[slotIx] = h;
     Audio.sfx('fanfare');
     FX.burst(innerWidth / 2, innerHeight * 0.35, 40, { color: '#C77DFF' });
@@ -249,7 +249,7 @@ const Solarium = {
     const cell = S.emptyCell();
     if (cell < 0){ Audio.sfx('error'); UI.toast('Garden is full! Make room first.'); return; }
     S.save.solarium[i] = null;
-    S.save.board[cell] = p;
+    S.G().board[cell] = p;
     Audio.sfx('drop');
     UI.toast(`${S.tierOf(p.f, p.t).name} moved back to the Garden.`);
     this.render();

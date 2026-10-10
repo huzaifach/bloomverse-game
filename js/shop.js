@@ -53,7 +53,7 @@ const Shop = {
       UI.banner('☀️ Sunlight Burst! 2× Dewdrops for 10 min');
     } else if (e.type === 'joyfulRain'){
       let n = 0;
-      for (const p of S.save.board){ if (p){ p.hap = 100; n++; } }
+      for (const p of S.G().board){ if (p){ p.hap = 100; n++; } }
       Board.render();
       FX.burst(innerWidth / 2, innerHeight * 0.4, 30, { color: '#FF6B9D' });
       Pip.say('Wheee! Everyone is SO happy now!', 'cheer', 3000);

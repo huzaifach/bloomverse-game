@@ -281,3 +281,13 @@ h2{margin:4px 0 10px;text-align:center;color:#2E7D32}
 @keyframes comboZoom{0%{transform:translate(-50%,-50%) scale(.5)}40%{transform:translate(-50%,-50%) scale(1.35)}100%{transform:translate(-50%,-80px) scale(1);opacity:0}}
 body.reduced-motion *{animation-duration:.01s !important;transition-duration:.01s !important}
 @media (max-width:380px){.hud-title span{display:none}.packet .pname{font-size:9px}}
+.garden-tabs{display:flex;gap:8px;justify-content:center;margin-bottom:6px}
+.gtab{border:2px solid var(--leaf);background:#fff;border-radius:99px;padding:4px 14px;font-weight:800;
+  font-size:13px;color:var(--ink);cursor:pointer}
+.gtab.active{background:var(--leaf);color:#fff}
+.gtab:disabled{opacity:.55;cursor:default}
+.perk-row{display:flex;gap:10px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.perk-card{cursor:pointer;min-width:110px;text-align:center}
+.perk-card:hover{transform:scale(1.05)}
+#garden-level{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.weather-pill{font-size:12px;font-weight:800;background:#E3F2FD;border-radius:99px;padding:4px 12px;border:2px solid #90CAF9}

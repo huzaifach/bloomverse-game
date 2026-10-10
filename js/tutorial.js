@@ -61,7 +61,7 @@ const Tutorial = {
     const cell = S.emptyCell();
     if (cell >= 0 && !this.giftGiven){
       this.giftGiven = true;
-      S.save.board[cell] = { f: 'forest-herbs', t: 4, hap: 60 };
+      S.G().board[cell] = { f: 'forest-herbs', t: 4, hap: 60 };
       S.discover('forest-herbs', 4);
       Board.render();
       Save.write(S.save);

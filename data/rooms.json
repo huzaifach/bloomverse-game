@@ -41,6 +41,38 @@
       "id": "astral-solarium",
       "name": "The Astral Solarium",
       "renownCost": 60
+    },
+    {
+      "id": "ember-forge",
+      "name": "The Ember Forge",
+      "renownCost": 40,
+      "desc": "A forge of gentle flame where fire-flowers are born.",
+      "flavor": "Walls of warm ember-glass. The air smells like cinnamon and courage.",
+      "effects": {}
+    },
+    {
+      "id": "tide-pools",
+      "name": "The Tide Pools",
+      "renownCost": 80,
+      "desc": "Moonlit pools where ocean gardens grow.",
+      "flavor": "Cool blue grottos. You can hear the sea breathing.",
+      "effects": {}
+    },
+    {
+      "id": "storm-spire",
+      "name": "The Storm Spire",
+      "renownCost": 120,
+      "desc": "A tower that catches lightning for its flowers.",
+      "flavor": "Crackling crystal rods. The petals drink the storm.",
+      "effects": {}
+    },
+    {
+      "id": "honey-hollow",
+      "name": "The Honey Hollow",
+      "renownCost": 160,
+      "desc": "A golden hive-hall of endless sweetness.",
+      "flavor": "Amber light drips like honey. Everything glows.",
+      "effects": {}
     }
   ]
 }

@@ -5,16 +5,16 @@ const App = {
   async boot(){
     try {
       const [families, orders, rooms, achievements, shop, daily, expansions, milestones, pip, giggles] = await Promise.all([
-        fetch('data/families.json?v=7').then(r => r.json()),
-        fetch('data/orders.json?v=7').then(r => r.json()),
-        fetch('data/rooms.json?v=7').then(r => r.json()),
-        fetch('data/achievements.json?v=7').then(r => r.json()),
-        fetch('data/shop.json?v=7').then(r => r.json()),
-        fetch('data/daily.json?v=7').then(r => r.json()),
-        fetch('data/expansions.json?v=7').then(r => r.json()),
-        fetch('data/milestones.json?v=7').then(r => r.json()),
-        fetch('data/pip.json?v=7').then(r => r.json()),
-        fetch('data/giggles.json?v=7').then(r => r.json())
+        fetch('data/families.json?v=8').then(r => r.json()),
+        fetch('data/orders.json?v=8').then(r => r.json()),
+        fetch('data/rooms.json?v=8').then(r => r.json()),
+        fetch('data/achievements.json?v=8').then(r => r.json()),
+        fetch('data/shop.json?v=8').then(r => r.json()),
+        fetch('data/daily.json?v=8').then(r => r.json()),
+        fetch('data/expansions.json?v=8').then(r => r.json()),
+        fetch('data/milestones.json?v=8').then(r => r.json()),
+        fetch('data/pip.json?v=8').then(r => r.json()),
+        fetch('data/giggles.json?v=8').then(r => r.json())
       ]);
       S.data = {
         families: families.families,
@@ -73,6 +73,15 @@ const App = {
     UI.refreshHUD();
     UI.refreshSoundIcon();
     UI.updateBadges();
+    // V4: Moonlit Grove auto-unlocks at Garden Level 15
+    if (S.gardenLevel() >= 15 && S.save.gardens[1].locked){
+      S.unlockGrove();
+      setTimeout(() => {
+        UI.banner('🌙 The Moonlit Grove is open!<br><span style="font-size:15px">A second garden under the stars!</span>');
+        Pip.say('A whole new garden! Tap the moon tab to visit it!', 'cheer', 5000);
+      }, 6000);
+      Milestones.check();
+    }
 
     document.getElementById('btn-daily').addEventListener('click', () => Daily.openManual());
     document.getElementById('btn-share').addEventListener('click', () => Share.share());
@@ -103,7 +112,7 @@ const App = {
 
   /* Brand-new garden: pre-planted pairs so the first merge lands in seconds. */
   richStart(){
-    const b = S.save.board;
+    const b = S.G().board;
     b[0] = { f: 'forest-herbs', t: 1, hap: 30 };
     b[1] = { f: 'forest-herbs', t: 1, hap: 30 };
     b[4] = { f: 'crystal-succulents', t: 1, hap: 30 };
@@ -202,6 +211,12 @@ const App = {
     if (rate > 0){
       S.save.dewdrops = Math.round((S.save.dewdrops + rate) * 100) / 100;
       S.save.stats.lifetimeDew = Math.round((S.save.stats.lifetimeDew + rate) * 100) / 100;
+    }
+    // V4: plants earn coins idly too
+    const crate = S.coinPerSecond();
+    if (crate > 0){
+      S.save.coins = Math.round((S.save.coins + crate) * 100) / 100;
+      S.save.stats.lifetimeCoins = Math.round((S.save.stats.lifetimeCoins + crate) * 100) / 100;
     }
     S.save.stats.playtimeSec++;
     Solarium.tick();

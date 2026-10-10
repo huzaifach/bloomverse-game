@@ -316,6 +316,326 @@
         "type": "room"
       },
       "seedBase": 20
+    },
+    {
+      "id": "ember-blooms",
+      "name": "Ember Blooms",
+      "artPrefix": "eb",
+      "tagline": "Flowers of living flame. They hum with warmth.",
+      "seedBase": 30,
+      "unlock": {
+        "type": "room",
+        "room": "ember-forge"
+      },
+      "growth": "instant",
+      "instantSproutCoins": 30,
+      "spawnerCooldownSec": 0,
+      "tiers": [
+        {
+          "tier": 1,
+          "name": "Spark Sprout",
+          "desc": "A tiny sprout, full of promise.",
+          "sellCoins": 35,
+          "dewPerSec": 1.2,
+          "orderValue": 24
+        },
+        {
+          "tier": 2,
+          "name": "Cinder Bud",
+          "desc": "A small bud, dreaming big.",
+          "sellCoins": 66,
+          "dewPerSec": 1.9,
+          "orderValue": 46
+        },
+        {
+          "tier": 3,
+          "name": "Flame Petal",
+          "desc": "A young bloom, finding its colors.",
+          "sellCoins": 126,
+          "dewPerSec": 2.9,
+          "orderValue": 88
+        },
+        {
+          "tier": 4,
+          "name": "Blaze Bloom",
+          "desc": "A lush plant, glowing with life.",
+          "sellCoins": 240,
+          "dewPerSec": 4.5,
+          "orderValue": 168
+        },
+        {
+          "tier": 5,
+          "name": "Inferno Flower",
+          "desc": "A grand bloom, turning heads.",
+          "sellCoins": 456,
+          "dewPerSec": 6.9,
+          "orderValue": 319
+        },
+        {
+          "tier": 6,
+          "name": "Pyro Monarch",
+          "desc": "A majestic plant, radiating power.",
+          "sellCoins": 867,
+          "dewPerSec": 10.7,
+          "orderValue": 607
+        },
+        {
+          "tier": 7,
+          "name": "Volcano Crown",
+          "desc": "A royal plant, sparkling with magic.",
+          "sellCoins": 1647,
+          "dewPerSec": 16.6,
+          "orderValue": 1153
+        },
+        {
+          "tier": 8,
+          "name": "Phoenix Inferno",
+          "desc": "A mythical wonder. Legends bow to it.",
+          "sellCoins": 3129,
+          "dewPerSec": 25.8,
+          "orderValue": 2190
+        }
+      ]
+    },
+    {
+      "id": "tidal-kelps",
+      "name": "Tidal Kelps",
+      "artPrefix": "tk",
+      "tagline": "Ocean gardens that sing with the tide.",
+      "seedBase": 45,
+      "unlock": {
+        "type": "room",
+        "room": "tide-pools"
+      },
+      "growth": "instant",
+      "instantSproutCoins": 45,
+      "spawnerCooldownSec": 0,
+      "tiers": [
+        {
+          "tier": 1,
+          "name": "Bubble Sprout",
+          "desc": "A tiny sprout, full of promise.",
+          "sellCoins": 55,
+          "dewPerSec": 1.8,
+          "orderValue": 38
+        },
+        {
+          "tier": 2,
+          "name": "Kelp Bud",
+          "desc": "A small bud, dreaming big.",
+          "sellCoins": 104,
+          "dewPerSec": 2.8,
+          "orderValue": 73
+        },
+        {
+          "tier": 3,
+          "name": "Wave Frond",
+          "desc": "A young bloom, finding its colors.",
+          "sellCoins": 199,
+          "dewPerSec": 4.3,
+          "orderValue": 139
+        },
+        {
+          "tier": 4,
+          "name": "Tide Bloom",
+          "desc": "A lush plant, glowing with life.",
+          "sellCoins": 377,
+          "dewPerSec": 6.7,
+          "orderValue": 264
+        },
+        {
+          "tier": 5,
+          "name": "Coral Dancer",
+          "desc": "A grand bloom, turning heads.",
+          "sellCoins": 717,
+          "dewPerSec": 10.4,
+          "orderValue": 502
+        },
+        {
+          "tier": 6,
+          "name": "Abyssal Bloom",
+          "desc": "A majestic plant, radiating power.",
+          "sellCoins": 1362,
+          "dewPerSec": 16.1,
+          "orderValue": 953
+        },
+        {
+          "tier": 7,
+          "name": "Leviathan Kelp",
+          "desc": "A royal plant, sparkling with magic.",
+          "sellCoins": 2588,
+          "dewPerSec": 25.0,
+          "orderValue": 1812
+        },
+        {
+          "tier": 8,
+          "name": "Ocean Sovereign",
+          "desc": "A mythical wonder. Legends bow to it.",
+          "sellCoins": 4916,
+          "dewPerSec": 38.7,
+          "orderValue": 3441
+        }
+      ]
+    },
+    {
+      "id": "storm-petals",
+      "name": "Storm Petals",
+      "artPrefix": "sp",
+      "tagline": "Blooms that bottled a thunderstorm.",
+      "seedBase": 65,
+      "unlock": {
+        "type": "room",
+        "room": "storm-spire"
+      },
+      "growth": "instant",
+      "instantSproutCoins": 65,
+      "spawnerCooldownSec": 0,
+      "tiers": [
+        {
+          "tier": 1,
+          "name": "Static Sprout",
+          "desc": "A tiny sprout, full of promise.",
+          "sellCoins": 80,
+          "dewPerSec": 2.5,
+          "orderValue": 56
+        },
+        {
+          "tier": 2,
+          "name": "Spark Bud",
+          "desc": "A small bud, dreaming big.",
+          "sellCoins": 152,
+          "dewPerSec": 3.9,
+          "orderValue": 106
+        },
+        {
+          "tier": 3,
+          "name": "Volt Petal",
+          "desc": "A young bloom, finding its colors.",
+          "sellCoins": 289,
+          "dewPerSec": 6.0,
+          "orderValue": 202
+        },
+        {
+          "tier": 4,
+          "name": "Thunder Bloom",
+          "desc": "A lush plant, glowing with life.",
+          "sellCoins": 549,
+          "dewPerSec": 9.3,
+          "orderValue": 384
+        },
+        {
+          "tier": 5,
+          "name": "Tempest Flower",
+          "desc": "A grand bloom, turning heads.",
+          "sellCoins": 1043,
+          "dewPerSec": 14.4,
+          "orderValue": 730
+        },
+        {
+          "tier": 6,
+          "name": "Lightning Monarch",
+          "desc": "A majestic plant, radiating power.",
+          "sellCoins": 1981,
+          "dewPerSec": 22.4,
+          "orderValue": 1387
+        },
+        {
+          "tier": 7,
+          "name": "Hurricane Crown",
+          "desc": "A royal plant, sparkling with magic.",
+          "sellCoins": 3764,
+          "dewPerSec": 34.7,
+          "orderValue": 2635
+        },
+        {
+          "tier": 8,
+          "name": "Storm God Bloom",
+          "desc": "A mythical wonder. Legends bow to it.",
+          "sellCoins": 7151,
+          "dewPerSec": 53.7,
+          "orderValue": 5006
+        }
+      ]
+    },
+    {
+      "id": "honey-blooms",
+      "name": "Honey Blooms",
+      "artPrefix": "hb",
+      "tagline": "Golden flowers dripping with sweet light.",
+      "seedBase": 90,
+      "unlock": {
+        "type": "room",
+        "room": "honey-hollow"
+      },
+      "growth": "instant",
+      "instantSproutCoins": 90,
+      "spawnerCooldownSec": 0,
+      "tiers": [
+        {
+          "tier": 1,
+          "name": "Nectar Sprout",
+          "desc": "A tiny sprout, full of promise.",
+          "sellCoins": 110,
+          "dewPerSec": 3.2,
+          "orderValue": 77
+        },
+        {
+          "tier": 2,
+          "name": "Pollen Bud",
+          "desc": "A small bud, dreaming big.",
+          "sellCoins": 209,
+          "dewPerSec": 5.0,
+          "orderValue": 146
+        },
+        {
+          "tier": 3,
+          "name": "Golden Petal",
+          "desc": "A young bloom, finding its colors.",
+          "sellCoins": 397,
+          "dewPerSec": 7.7,
+          "orderValue": 278
+        },
+        {
+          "tier": 4,
+          "name": "Honey Bloom",
+          "desc": "A lush plant, glowing with life.",
+          "sellCoins": 754,
+          "dewPerSec": 11.9,
+          "orderValue": 528
+        },
+        {
+          "tier": 5,
+          "name": "Amber Flower",
+          "desc": "A grand bloom, turning heads.",
+          "sellCoins": 1434,
+          "dewPerSec": 18.5,
+          "orderValue": 1004
+        },
+        {
+          "tier": 6,
+          "name": "Hive Monarch",
+          "desc": "A majestic plant, radiating power.",
+          "sellCoins": 2724,
+          "dewPerSec": 28.6,
+          "orderValue": 1907
+        },
+        {
+          "tier": 7,
+          "name": "Royal Jelly Crown",
+          "desc": "A royal plant, sparkling with magic.",
+          "sellCoins": 5175,
+          "dewPerSec": 44.4,
+          "orderValue": 3622
+        },
+        {
+          "tier": 8,
+          "name": "Eternal Honey Bloom",
+          "desc": "A mythical wonder. Legends bow to it.",
+          "sellCoins": 9833,
+          "dewPerSec": 68.8,
+          "orderValue": 6883
+        }
+      ]
     }
   ]
 }

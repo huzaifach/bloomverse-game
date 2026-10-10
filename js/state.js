@@ -20,6 +20,39 @@ const S = {
     return f.unlock.type === 'start' || this.save.rooms.includes(f.unlock.room);
   },
 
+  /* ---------- gardens (V4: Meadow + Moonlit Grove) ---------- */
+  G(){
+    const gs = this.save.gardens;
+    if (gs && gs[this.save.activeGarden || 0]) return gs[this.save.activeGarden || 0];
+    return { board: this.save.board, gridSize: this.save.gridSize }; // fallback: pre-V4 saves, tests
+  },
+  isGroveUnlocked(){
+    const g = this.save.gardens;
+    if (g && g[1] && !g[1].locked) return true;
+    return this.gardenLevel() >= 15;
+  },
+  unlockGrove(){
+    const g = this.save.gardens;
+    if (g && g[1] && g[1].locked){
+      g[1].locked = false;
+      Save.write(this.save);
+      return true;
+    }
+    return false;
+  },
+  switchGarden(ix){
+    if (ix === 1 && !this.isGroveUnlocked()){
+      UI.toast('🌙 The Moonlit Grove unlocks at Garden Level 15.');
+      return;
+    }
+    this.save.activeGarden = ix;
+    if (ix === 1) this.unlockGrove();
+    Board.selected = -1;
+    Board.render(); Board.renderPackets(); Board.renderTopBar();
+    UI.refreshHUD();
+    Save.write(this.save);
+  },
+
   /* ---------- rooms / effects ---------- */
   hasRoom(id){ return this.save.rooms.includes(id); },
   effect(key, def){
@@ -32,14 +65,52 @@ const S = {
   },
 
   solariumSlotCount(){ return 6 + (this.effect('solariumSlotsBonus', 0) || 0); },
-  gridSize(){ return S.save.gridSize || 4; },
-  gardenLevel(){ return 1 + Math.floor((S.save.stats.merges || 0) / 20); },
-  seedCost(fid){
-    const base = this.family(fid).seedBase || 5;
-    const mult = this.effect('seedCostMult', 1) || 1;
-    return Math.max(1, Math.round(base * (1 + 0.09 * (this.gardenLevel() - 1)) * mult));
+
+  /* V4: plants earn coins idly too — a tiny fraction of their sell value */
+  coinPerSecond(){
+    let r = 0;
+    for (const g of (this.save.gardens || [])){
+      for (const p of g.board){
+        if (!p || p.weed) continue;
+        r += this.sellValueOf(p) * 0.0002;
+      }
+    }
+    return r;
   },
-  hapMult(){ return this.effect('happinessGainMult', 1) || 1; },
+  gridSize(){ return S.G().gridSize || 4; },
+  gardenLevel(){ return 1 + Math.floor((S.save.stats.merges || 0) / 20); },
+  /* V4: bought seeds plant at (highest discovered tier - 5), never below tier 1 */
+  seedTier(){
+    return Math.max(1, (this.save.stats.maxTier || 1) - 5);
+  },
+  /* repeat-buy demand: buying the same family's seed again today costs a little more */
+  seedStreakMult(fid){
+    const st = this.save.seedStreak || {};
+    const today = new Date().toISOString().slice(0, 10);
+    if (st.date !== today) return 1;
+    const n = (st.counts || {})[fid] || 0;
+    return Math.pow(1.04, n);
+  },
+  bumpSeedStreak(fid){
+    const today = new Date().toISOString().slice(0, 10);
+    const st = this.save.seedStreak || {};
+    if (st.date !== today){ st.date = today; st.counts = {}; }
+    st.counts = st.counts || {};
+    st.counts[fid] = (st.counts[fid] || 0) + 1;
+    this.save.seedStreak = st;
+  },
+  seedCost(fid, tier){
+    const t = tier || this.seedTier();
+    const sell = this.tierOf(fid, t).sellCoins;
+    const mult = this.effect('seedCostMult', 1) || 1;
+    let cost = Math.max(1, Math.round(sell * (1 + 0.09 * (this.gardenLevel() - 1)) * mult));
+    cost = Math.ceil(cost * this.seedStreakMult(fid)); // ceil so even tiny demand bumps show
+    return cost;
+  },
+  hapMult(){
+    const base = this.effect('happinessGainMult', 1) || 1;
+    return base * (typeof Weather !== 'undefined' ? Weather.hapMult() : 1);
+  },
   sellValueOf(p){
     if (!p) return 0;
     let v = this.tierOf(p.f, p.t).sellCoins;
@@ -47,6 +118,7 @@ const S = {
     if (p.hap >= 80) v = Math.round(v * 1.25);
     if (S.save.boosts.mergeValueMerges > 0) v *= 2;
     v = Math.round(v * (typeof Prestige !== 'undefined' ? Prestige.coinMult() : 1));
+    v = Math.round(v * (typeof Weather !== 'undefined' ? Weather.coinMult() : 1));
     return v;
   },
   /* ---------- economy ---------- */
@@ -63,6 +135,7 @@ const S = {
       if (p.golden) r *= 2;
       if (p.hap >= 80) r *= 1.1;
       r *= (typeof Prestige !== 'undefined' ? Prestige.dewMult() : 1);
+      r *= (typeof Weather !== 'undefined' ? Weather.dewMult() : 1);
       if (p.f === 'crystal-succulents') r *= sucM;
       rate += r;
     }
@@ -97,19 +170,19 @@ const S = {
   },
 
   /* ---------- board helpers ---------- */
-  emptyCell(){ return this.save.board.findIndex(c => !c); },
+  emptyCell(){ return this.G().board.findIndex(c => !c); },
   boardCount(fid, tier){
-    return this.save.board.reduce((n, c) => n + ((c && c.f === fid && c.t === tier) ? 1 : 0), 0);
+    return this.G().board.reduce((n, c) => n + ((c && c.f === fid && c.t === tier) ? 1 : 0), 0);
   },
   boardHas(fid, tier, n){ return this.boardCount(fid, tier) >= n; },
 
   takePlants(fid, tier, n){
     // removes n matching plants from board (lowest indices first), returns taken count
     let taken = 0;
-    const len = this.save.board.length;
+    const len = this.G().board.length;
     for (let i = 0; i < len && taken < n; i++){
-      const c = this.save.board[i];
-      if (c && c.f === fid && c.t === tier){ this.save.board[i] = null; taken++; }
+      const c = this.G().board[i];
+      if (c && c.f === fid && c.t === tier){ this.G().board[i] = null; taken++; }
     }
     return taken;
   },

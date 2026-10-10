@@ -37,13 +37,19 @@ const UI = {
     if (n === undefined || n === null || isNaN(n)) return '0';
     n = Math.floor(n * 10) / 10;
     if (n < 1000) return (n % 1 === 0) ? String(n) : n.toFixed(1);
-    if (n < 1e6) return (n / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
-    return (n / 1e6).toFixed(2).replace(/\.00$/, '') + 'M';
+    const units = ['k', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc'];
+    let u = -1, v = n;
+    while (v >= 1000 && u < units.length - 1){ v /= 1000; u++; }
+    const str = v >= 100 ? v.toFixed(0) : v.toFixed(2).replace(/\.?0+$/, '');
+    return str + units[u];
   },
 
   refreshHUD(){
     const sv = S.save;
-    document.getElementById('pill-coins').innerHTML = this.ICONS.coin + '<span>' + this.fmt(sv.coins) + '</span>';
+    const crate = S.coinPerSecond();
+    const coinEl = document.getElementById('pill-coins');
+    coinEl.innerHTML = this.ICONS.coin + '<span>' + this.fmt(sv.coins) + '</span>';
+    coinEl.title = 'Coins' + (crate > 0 ? ` (+${crate.toFixed(1)}/s idle)` : '');
     const rate = S.dewPerSecond();
     const dewEl = document.getElementById('pill-dew');
     dewEl.innerHTML = this.ICONS.dew + '<span>' + this.fmt(sv.dewdrops) + '</span>';
@@ -71,7 +77,7 @@ const UI = {
     // garden: mergeable pairs waiting
     let pairs = 0;
     try {
-      const seen = {}, b = S.save.board;
+      const seen = {}, b = S.G().board;
       for (let i = 0; i < b.length; i++){
         const p = b[i];
         if (!p || p.t >= 8) continue;
@@ -212,7 +218,7 @@ const Seeds = {
     const f = fams[(Math.random() * fams.length) | 0];
     const t = 1 + ((Math.random() * 3) | 0);
     S.save.seeds--;
-    S.save.board[cell] = { f: f.id, t };
+    S.G().board[cell] = { f: f.id, t };
     S.discover(f.id, t);
     S.save.stats.sprouts++;
     Challenge.bump('plant');

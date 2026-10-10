@@ -15,7 +15,7 @@ const Board = {
     grid.addEventListener('contextmenu', e => e.preventDefault());
   },
 
-  size(){ return S.save.gridSize || 4; },
+  size(){ return S.G().gridSize || 4; },
 
   /* ---------- rendering ---------- */
   render(){
@@ -26,7 +26,7 @@ const Board = {
     for (let i = 0; i < n * n; i++){
       const cell = document.createElement('div');
       cell.className = 'cell'; cell.dataset.i = i;
-      const p = S.save.board[i];
+      const p = S.G().board[i];
       if (p){
         cell.classList.add('filled');
         if (p.weed){
@@ -45,11 +45,11 @@ const Board = {
     }
     // subtle merge hints: pulse every twin of the selected plant
     if (this.selected >= 0){
-      const s = S.save.board[this.selected];
+      const s = S.G().board[this.selected];
       if (s && s.t < 8){
         for (let i = 0; i < n * n; i++){
           if (i === this.selected) continue;
-          const p = S.save.board[i];
+          const p = S.G().board[i];
           if (p && !p.weed && p.f === s.f && p.t === s.t){
             const c = grid.children[i];
             if (c) c.classList.add('merge-hint');
@@ -70,8 +70,16 @@ const Board = {
     }
     const burstCd = Math.max(0, Math.ceil(((S.save.bloomBurstAt || 0) + 90000 - Date.now()) / 1000));
     const canBurst = burstCd <= 0 && this.findMergePair() !== -1;
-    bar.innerHTML = `<div class="lvl">🌱 Garden Lv ${S.gardenLevel()}</div>
+    const groveOpen = S.isGroveUnlocked();
+    const ag = S.save.activeGarden || 0;
+    bar.innerHTML = `<div class="garden-tabs">
+        <button class="gtab${ag === 0 ? ' active' : ''}" data-g="0">☀️ Meadow</button>
+        <button class="gtab${ag === 1 ? ' active' : ''}" data-g="1" ${groveOpen ? '' : 'disabled'}>🌙 Grove${groveOpen ? '' : ' 🔒'}</button>
+      </div>
+      <div class="lvl">🌱 Garden Lv ${S.gardenLevel()}</div>
+      ${Weather.pillHTML()}
       <button id="bloom-burst" ${canBurst ? '' : 'disabled'}>💥 Bloom Burst${burstCd > 0 ? ` (${burstCd}s)` : ''}</button>`;
+    bar.querySelectorAll('.gtab').forEach(b => b.onclick = () => S.switchGarden(parseInt(b.dataset.g, 10)));
     const bb = document.getElementById('bloom-burst');
     if (canBurst) bb.onclick = () => this.bloomBurst();
     this.renderExpandBtn();
@@ -103,10 +111,10 @@ const Board = {
     S.addCoins(-c.coins);
     if (c.dewdrops) S.addDew(-c.dewdrops);
     const oldN = this.size(), newN = ex.size;
-    const oldBoard = S.save.board.slice();
-    S.save.board = new Array(newN * newN).fill(null);
-    for (let i = 0; i < oldBoard.length; i++) S.save.board[i] = oldBoard[i];
-    S.save.gridSize = newN;
+    const oldBoard = S.G().board.slice();
+    S.G().board = new Array(newN * newN).fill(null);
+    for (let i = 0; i < oldBoard.length; i++) S.G().board[i] = oldBoard[i];
+    S.G().gridSize = newN;
     Audio.sfx('fanfare');
     UI.banner(`🌳 Garden expanded to ${newN}x${newN}!`);
     Pip.say(S.data.pip.expansion[(Math.random() * S.data.pip.expansion.length) | 0], 'cheer');
@@ -119,8 +127,9 @@ const Board = {
   },
 
   renderPackets(){
-    // perf: only rebuild when affordability changes (called every tick)
-    const sig = S.data.families.map(f => (S.isFamilyUnlocked(f.id) ? '1' : '0') + (S.save.coins >= S.seedCost(f.id) ? '1' : '0')).join('');
+    // perf: only rebuild when affordability/tier changes (called every tick)
+    const st = S.seedTier();
+    const sig = st + '|' + S.data.families.map(f => (S.isFamilyUnlocked(f.id) ? '1' : '0') + (S.save.coins >= S.seedCost(f.id) ? '1' : '0')).join('');
     if (sig === this._packetSig) return;
     this._packetSig = sig;
     const row = document.getElementById('packet-row');
@@ -132,10 +141,10 @@ const Board = {
       const el = document.createElement('div');
       el.className = 'packet' + (unlocked ? '' : ' locked') + (unlocked && !afford ? ' cant' : '');
       el.innerHTML = `
-        <img src="${S.artFor(f.id, 1)}" alt="${f.name}" draggable="false">
+        <img src="${S.artFor(f.id, st)}" alt="${f.name}" draggable="false">
         <div class="pname">${f.name}</div>
-        ${unlocked ? `<div class="cost">🪙${cost}</div>` : `<div class="cost">🔒</div>`}`;
-      el.title = unlocked ? `Tap to plant instantly — ${cost} coins, no waiting!` : 'Unlock in the Astral Solarium wing';
+        ${unlocked ? `<div class="cost">🪙${cost}</div><div class="ptier">Tier ${st}</div>` : `<div class="cost">🔒</div>`}`;
+      el.title = unlocked ? `Tap to plant a Tier ${st} instantly — ${cost} coins, no waiting!` : 'Unlock via Haven rooms';
       el.addEventListener('click', () => this.packetTap(f.id));
       row.appendChild(el);
     }
@@ -167,9 +176,11 @@ const Board = {
     }
     S.addCoins(-cost);
     const cell = S.emptyCell();
-    S.save.board[cell] = { f: fid, t: 1, hap: 20 };
-    S.discover(fid, 1);
+    const ptier = S.seedTier();
+    S.G().board[cell] = { f: fid, t: ptier, hap: 20 };
+    S.discover(fid, ptier);
     S.save.stats.sprouts++;
+    S.bumpSeedStreak(fid);
     Challenge.bump('plant');
     Audio.sfx('sprout');
     this.selected = -1;
@@ -178,7 +189,7 @@ const Board = {
     if (cellEl) cellEl.classList.add('spawn');
     const r = this.cellRect(cell);
     FX.burst(r.x, r.y, 10, { color: '#8FE063' });
-    FX.floatText(r.x, r.y - 24, S.tierOf(fid, 1).name, '#2E7D32');
+    FX.floatText(r.x, r.y - 24, S.tierOf(fid, ptier).name, '#2E7D32');
     document.dispatchEvent(new CustomEvent('bv:sprout'));
     Milestones.check();
     Achievements.check();
@@ -200,7 +211,7 @@ const Board = {
     const dist = Math.hypot(e.clientX - d.sx, e.clientY - d.sy);
     if (!d.active && dist > 12){
       d.active = true;
-      const p = S.save.board[d.from];
+      const p = S.G().board[d.from];
       const ghost = document.getElementById('drag-ghost');
       ghost.innerHTML = `<img src="${S.artFor(p.f, p.t)}" draggable="false">`;
       ghost.style.display = 'block';
@@ -220,7 +231,7 @@ const Board = {
         const to = parseInt(cell.dataset.i, 10);
         if (to !== d.from){
           d.target = to;
-          const a = S.save.board[d.from], b = S.save.board[to];
+          const a = S.G().board[d.from], b = S.G().board[to];
           if (b && a.f === b.f && a.t === b.t && a.t < 8) cell.classList.add('merge-target');
           else cell.classList.add('drop-target');
         }
@@ -245,8 +256,8 @@ const Board = {
   onTap(i){
     Audio.sfx('click');
     if (this.selected === -1){
-      if (S.save.board[i]){
-        if (S.save.board[i].weed){
+      if (S.G().board[i]){
+        if (S.G().board[i].weed){
           UI.toast('🌿 A weed! Drag two weeds together to clear them.');
           return;
         }
@@ -268,7 +279,7 @@ const Board = {
 
   /* ---------- plants are alive: tap → giggle ---------- */
   giggle(i){
-    const p = S.save.board[i];
+    const p = S.G().board[i];
     if (!p) return;
     const now = Date.now();
     if (p._giggleAt && now - p._giggleAt < 2500) return; // don't spam
@@ -294,11 +305,12 @@ const Board = {
   },
 
   resolveDrop(from, to){
-    const a = S.save.board[from], b = S.save.board[to];
+    const a = S.G().board[from], b = S.G().board[to];
     if (!a){ this.render(); return; }
     // weeds: drag two weeds together to clear them
     if (a.weed && b && b.weed){
-      S.save.board[from] = null; S.save.board[to] = null;
+      S.G().board[from] = null; S.G().board[to] = null;
+      S.save.stats.weedsCleared = (S.save.stats.weedsCleared || 0) + 2;
       const reward = Math.round(120 * S.gardenLevel() * Prestige.coinMult());
       S.addCoins(reward);
       FX.burst(innerWidth / 2, innerHeight / 2, 16, { color: '#6BCB77' });
@@ -311,13 +323,13 @@ const Board = {
       return;
     }
     if (!b){
-      S.save.board[to] = a; S.save.board[from] = null;
+      S.G().board[to] = a; S.G().board[from] = null;
       Audio.sfx('drop');
     } else if (!a.weed && !b.weed && a.f === b.f && a.t === b.t && a.t < 8){
       this.doMerge(from, to);
       return;
     } else {
-      S.save.board[to] = a; S.save.board[from] = b;
+      S.G().board[to] = a; S.G().board[from] = b;
       Audio.sfx('drop');
     }
     this.render();
@@ -325,7 +337,7 @@ const Board = {
   },
 
   doMerge(from, to){
-    const a = S.save.board[from];
+    const a = S.G().board[from];
     const nt = a.t + 1;
     const now = Date.now();
     // combo tracking
@@ -342,10 +354,10 @@ const Board = {
       S.save.boosts.rainbowMerges--;
     } else {
       // golden surprise: 3% of merges produce a rare golden plant (3x value)
-      golden = Math.random() < 0.03;
+      golden = Math.random() < 0.03 * Weather.goldenMult() + Prestige.luckBonus();
     }
-    S.save.board[to] = { f: a.f, t: nt, hap: newHap, golden: golden || undefined };
-    S.save.board[from] = null;
+    S.G().board[to] = { f: a.f, t: nt, hap: newHap, golden: golden || undefined };
+    S.G().board[from] = null;
     if (golden){
       S.save.stats.goldenMerges = (S.save.stats.goldenMerges || 0) + 1;
       UI.banner('🌟 GOLDEN PLANT! 🌟<br><span style="font-size:15px">Worth 3× coins!</span>');
@@ -360,7 +372,7 @@ const Board = {
     for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++){
       const nx = fx + dx, ny = fy + dy;
       if (nx < 0 || ny < 0 || nx >= n || ny >= n) continue;
-      const q = S.save.board[ny * n + nx];
+      const q = S.G().board[ny * n + nx];
       if (q) q.hap = Math.min(100, (q.hap || 0) + Math.round(6 * S.hapMult()));
     }
 
@@ -405,7 +417,7 @@ const Board = {
   },
 
   findMergePair(){
-    const b = S.save.board;
+    const b = S.G().board;
     const seen = {};
     for (let i = 0; i < b.length; i++){
       const p = b[i];
@@ -418,42 +430,48 @@ const Board = {
   },
 
   bloomBurst(){
-    const pair = this.findMergePair();
-    if (pair === -1){ UI.toast('No merges available right now.'); return; }
+    if (this.findMergePair() === -1){ UI.toast('No merges available right now.'); return; }
     S.save.bloomBurstAt = Date.now();
     S.save.stats.bursts = (S.save.stats.bursts || 0) + 1;
     Challenge.bump('bursts');
     Audio.sfx('fanfare');
     UI.banner('💥 BLOOM BURST! 💥');
     Pip.say('WATCH THIS! Everything merges at ONCE!', 'cheer', 3000);
-    const merges = [];
-    const used = new Set();
-    const b = S.save.board;
+    this._burstWave();
+  },
+
+  /* one wave = every currently-mergeable pair, lowest tier first;
+     then re-scan: newly formed plants chain into the next wave until nothing merges */
+  _burstWave(){
+    const b = S.G().board;
     const byKey = {};
+    const used = new Set();
+    const merges = [];
     for (let i = 0; i < b.length; i++){
       const p = b[i];
-      if (!p || p.t >= 8 || used.has(i)) continue;
+      if (!p || p.weed || p.t >= 8 || used.has(i)) continue;
       const k = p.f + ':' + p.t;
       if (byKey[k] !== undefined && !used.has(byKey[k])){
-        merges.push([byKey[k], i]);
+        merges.push([byKey[k], i, p.t]);
         used.add(byKey[k]); used.add(i);
         delete byKey[k];
       } else byKey[k] = i;
     }
+    if (!merges.length){ this.render(); this.renderTopBar(); UI.updateBadges(); return; }
+    merges.sort((x, y) => x[2] - y[2]); // level 1 first, cascading upward
     merges.forEach(([from, to], ix) => {
       setTimeout(() => {
-        const a = S.save.board[from], bb = S.save.board[to];
-        if (a && bb && a.f === bb.f && a.t === bb.t && a.t < 8) this.doMerge(from, to);
-        if (ix === merges.length - 1) this.renderTopBar();
-      }, ix * 160);
+        const bb = S.G().board;
+        const a = bb[from], c = bb[to];
+        if (a && c && !a.weed && !c.weed && a.f === c.f && a.t === c.t && a.t < 8) this.doMerge(from, to);
+        if (ix === merges.length - 1) setTimeout(() => this._burstWave(), 240);
+      }, ix * 140);
     });
-    this.renderTopBar();
-    Save.write(S.save);
   },
 
   /* ---------- plant action sheet ---------- */
   plantAction(i){
-    const p = S.save.board[i];
+    const p = S.G().board[i];
     if (!p) return;
     const t = S.tierOf(p.f, p.t), f = S.family(p.f);
     const v = S.sellValueOf(p);
@@ -476,11 +494,11 @@ const Board = {
   },
 
   sellPlant(i){
-    const p = S.save.board[i];
+    const p = S.G().board[i];
     if (!p) return;
     const v = S.sellValueOf(p);
     if (S.save.boosts.mergeValueMerges > 0) S.save.boosts.mergeValueMerges--;
-    S.save.board[i] = null;
+    S.G().board[i] = null;
     S.addCoins(v);
     Audio.sfx('coin');
     const r = this.cellRect(i);
@@ -493,12 +511,12 @@ const Board = {
   },
 
   moveToSolarium(i){
-    const p = S.save.board[i];
+    const p = S.G().board[i];
     if (!p) return;
     const slots = S.solariumSlotCount();
     const si = S.save.solarium.slice(0, slots).findIndex(s => !s);
     if (si < 0){ Audio.sfx('error'); UI.toast('Solarium is full! Unlock the Astral Solarium for +2 slots.'); return; }
-    S.save.board[i] = null;
+    S.G().board[i] = null;
     S.save.solarium[si] = p;
     S.save.stats.solariumMoves++;
     Audio.sfx('success');

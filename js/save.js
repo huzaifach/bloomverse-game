@@ -9,6 +9,14 @@ const Save = {
       version: this.VERSION,
       gridSize: 4,
       board: new Array(16).fill(null),
+      gardens: [
+        { name: 'meadow', board: new Array(16).fill(null), gridSize: 4, locked: false },
+        { name: 'grove', board: new Array(16).fill(null), gridSize: 4, locked: true },
+      ],
+      activeGarden: 0,
+      perks: { coin: 0, dew: 0, luck: 0 },
+      weather: { date: '', kind: 'sunny' },
+      seedStreak: { date: '', counts: {} },
       solarium: new Array(8).fill(null),
       hybrids: [null, null],
       coins: 150, dewdrops: 0, renown: 0, seeds: 2,
@@ -71,6 +79,24 @@ const Save = {
     const n = (out.gridSize >= 4 && out.gridSize <= 8) ? out.gridSize : 4;
     out.gridSize = n;
     if (!Array.isArray(out.board) || out.board.length !== n * n) out.board = new Array(n * n).fill(null);
+    // V4: two gardens — migrate flat board into the meadow.
+    // NOTE: check s.gardens (the save), not out.gardens (defaults would fake a pass).
+    if (!Array.isArray(s.gardens) || s.gardens.length !== 2){
+      out.gardens = [
+        { name: 'meadow', board: out.board, gridSize: n, locked: false },
+        { name: 'grove', board: new Array(16).fill(null), gridSize: 4, locked: true },
+      ];
+    } else {
+      out.gardens = out.gardens.map((g, ix) => {
+        const gn = (g.gridSize >= 4 && g.gridSize <= 8) ? g.gridSize : 4;
+        const gb = (Array.isArray(g.board) && g.board.length === gn * gn) ? g.board : new Array(gn * gn).fill(null);
+        return { name: ix === 0 ? 'meadow' : 'grove', board: gb, gridSize: gn, locked: ix === 1 ? !!g.locked : false };
+      });
+    }
+    if (out.activeGarden !== 1) out.activeGarden = 0;
+    if (typeof out.perks !== 'object' || !out.perks) out.perks = d.perks;
+    if (typeof out.weather !== 'object' || !out.weather) out.weather = d.weather;
+    if (typeof out.seedStreak !== 'object' || !out.seedStreak) out.seedStreak = d.seedStreak;
     if (!Array.isArray(out.solarium) || out.solarium.length !== 8) out.solarium = d.solarium;
     if (!Array.isArray(out.hybrids) || out.hybrids.length !== 2) out.hybrids = d.hybrids;
     if (!Array.isArray(out.rooms)) out.rooms = d.rooms;

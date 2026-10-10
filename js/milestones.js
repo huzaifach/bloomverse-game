@@ -18,9 +18,22 @@ const Milestones = {
       case 'lifetimeCoins': return Math.floor(st.lifetimeCoins || 0);
       case 'gardenLevel': return S.gardenLevel();
       case 'bursts': return st.bursts || 0;
+      case 'weeds': return st.weedsCleared || 0;
+      case 'meteors': return st.meteors || 0;
+      case 'frogs': return st.frogs || 0;
+      case 'parties': return st.parties || 0;
+      case 'rainbows': return st.rainbows || 0;
+      case 'perks': { const p = sv.perks || {}; return (p.coin || 0) + (p.dew || 0) + (p.luck || 0); }
+      case 'grove': return (sv.gardens && sv.gardens[1] && !sv.gardens[1].locked) ? 1 : 0;
+      case 'groveMax': return (sv.gardens && sv.gardens[1] && sv.gardens[1].gridSize >= 8) ? 1 : 0;
+      case 'weathers': return Object.keys(st.weathers || {}).length;
+      case 'ember8': case 'tidal8': case 'storm8': case 'honey8': {
+        const fid = { ember8: 'ember-blooms', tidal8: 'tidal-kelps', storm8: 'storm-petals', honey8: 'honey-blooms' }[id];
+        return (sv.codex[fid] && sv.codex[fid][7]) ? 1 : 0;
+      }
       case 'joyful': {
         let n = 0;
-        for (const p of sv.board) if (p && p.hap >= 80) n++;
+        for (const g of (S.save.gardens || [])) for (const p of g.board) if (p && p.hap >= 80) n++;
         for (const p of sv.solarium) if (p && p.hap >= 80) n++;
         return n;
       }

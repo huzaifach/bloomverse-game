@@ -29,9 +29,11 @@ const Orders = {
     const fams = unlocked.length ? unlocked : S.unlockedFamilies();
     const nItems = 1 + ((Math.random() * tpl.maxItems) | 0);
     const items = [];
+    // difficulty grows with garden level: higher tiers demanded (gradual, then steep)
+    const tierCap = Math.min(8, tpl.tierCap + Math.floor(S.gardenLevel() / 20));
     for (let i = 0; i < nItems; i++){
       const f = fams[(Math.random() * fams.length) | 0];
-      const t = 1 + ((Math.random() * Math.min(tpl.tierCap, 6)) | 0);
+      const t = 1 + ((Math.random() * tierCap) | 0);
       const ex = items.find(x => x.f === f.id && x.t === t);
       if (ex) ex.n++;
       else items.push({ f: f.id, t, n: 1 });
@@ -45,7 +47,7 @@ const Orders = {
       if (it.f === 'crystal-succulents') v *= succM; // Crystal Cave room bonus
       coins += v;
     }
-    coins = Math.round(coins * tpl.reward.coinsMult * mult * Prestige.coinMult());
+    coins = Math.round(coins * tpl.reward.coinsMult * mult * Prestige.coinMult() * Weather.coinMult());
     const renown = Math.round((tpl.reward.renownMin + Math.random() * (tpl.reward.renownMax - tpl.reward.renownMin)) * mult);
     const dewdrops = Math.round(tpl.reward.dewdrops * mult);
     const seeds = Math.random() < tpl.reward.mysterySeedChance * mult ? 1 : 0;
