@@ -5,16 +5,16 @@ const App = {
   async boot(){
     try {
       const [families, orders, rooms, achievements, shop, daily, expansions, milestones, pip, giggles] = await Promise.all([
-        fetch('data/families.json?v=9').then(r => r.json()),
-        fetch('data/orders.json?v=9').then(r => r.json()),
-        fetch('data/rooms.json?v=9').then(r => r.json()),
-        fetch('data/achievements.json?v=9').then(r => r.json()),
-        fetch('data/shop.json?v=9').then(r => r.json()),
-        fetch('data/daily.json?v=9').then(r => r.json()),
-        fetch('data/expansions.json?v=9').then(r => r.json()),
-        fetch('data/milestones.json?v=9').then(r => r.json()),
-        fetch('data/pip.json?v=9').then(r => r.json()),
-        fetch('data/giggles.json?v=9').then(r => r.json())
+        fetch('data/families.json?v=10').then(r => r.json()),
+        fetch('data/orders.json?v=10').then(r => r.json()),
+        fetch('data/rooms.json?v=10').then(r => r.json()),
+        fetch('data/achievements.json?v=10').then(r => r.json()),
+        fetch('data/shop.json?v=10').then(r => r.json()),
+        fetch('data/daily.json?v=10').then(r => r.json()),
+        fetch('data/expansions.json?v=10').then(r => r.json()),
+        fetch('data/milestones.json?v=10').then(r => r.json()),
+        fetch('data/pip.json?v=10').then(r => r.json()),
+        fetch('data/giggles.json?v=10').then(r => r.json())
       ]);
       S.data = {
         families: families.families,
@@ -225,7 +225,7 @@ const App = {
     Board.renderPackets();
     const dewEl = document.getElementById('pill-dew');
     if (dewEl) dewEl.innerHTML = UI.ICONS.dew + '<span>' + UI.fmt(S.save.dewdrops) + '</span>';
-    // bloom burst cooldown refresh (every ~5s)
+    // burst button + badges refresh (every ~5s)
     if (S.save.stats.playtimeSec % 5 === 0){ Board.renderTopBar(); UI.updateBadges(); }
     // day/night check every minute
     if (S.save.stats.playtimeSec % 60 === 0) this.dayNight();

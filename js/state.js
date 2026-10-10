@@ -84,9 +84,16 @@ const S = {
   },
   gridSize(){ return S.G().gridSize || 4; },
   gardenLevel(){ return 1 + Math.floor((S.save.stats.merges || 0) / 20); },
-  /* V4: bought seeds plant at (highest discovered tier - 5), never below tier 1 */
-  seedTier(){
-    return Math.max(1, (this.save.stats.maxTier || 1) - 5);
+  /* V4.2: bought seeds plant at (THAT FAMILY's highest discovered tier - 5), never below tier 1 */
+  topTier(fid){
+    const arr = this.save.codex[fid];
+    if (!arr) return 1;
+    for (let i = arr.length - 1; i >= 0; i--) if (arr[i]) return i + 1;
+    return 1;
+  },
+  seedTier(fid){
+    const top = fid ? this.topTier(fid) : (this.save.stats.maxTier || 1);
+    return Math.max(1, top - 5);
   },
   /* repeat-buy demand: buying the same family's seed again today costs a little more */
   seedStreakMult(fid){
@@ -105,7 +112,7 @@ const S = {
     this.save.seedStreak = st;
   },
   seedCost(fid, tier){
-    const t = tier || this.seedTier();
+    const t = tier || this.seedTier(fid);
     const sell = this.tierOf(fid, t).sellCoins;
     const mult = this.effect('seedCostMult', 1) || 1;
     let cost = Math.max(1, Math.round(sell * (1 + 0.09 * (this.gardenLevel() - 1)) * mult));

@@ -131,14 +131,14 @@ const Board = {
 
   renderPackets(){
     // perf: only rebuild when affordability/tier changes (called every tick)
-    const st = S.seedTier();
-    const sig = st + '|' + S.data.families.map(f => (S.isFamilyUnlocked(f.id) ? '1' : '0') + (S.save.coins >= S.seedCost(f.id) ? '1' : '0')).join('');
+    const sig = S.data.families.map(f => (S.isFamilyUnlocked(f.id) ? '1' : '0') + S.seedTier(f.id) + (S.save.coins >= S.seedCost(f.id) ? '1' : '0')).join('');
     if (sig === this._packetSig) return;
     this._packetSig = sig;
     const row = document.getElementById('packet-row');
     row.innerHTML = '';
     for (const f of S.data.families){
       const unlocked = S.isFamilyUnlocked(f.id);
+      const st = S.seedTier(f.id);
       const cost = S.seedCost(f.id);
       const afford = S.save.coins >= cost;
       const el = document.createElement('div');
@@ -179,7 +179,7 @@ const Board = {
     }
     S.addCoins(-cost);
     const cell = S.emptyCell();
-    const ptier = S.seedTier();
+    const ptier = S.seedTier(fid);
     S.G().board[cell] = { f: fid, t: ptier, hap: 20 };
     S.discover(fid, ptier);
     S.save.stats.sprouts++;

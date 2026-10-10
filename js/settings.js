@@ -12,8 +12,9 @@ const Settings = {
         <button class="btn btn-soft btn-small" id="set-export">Export Save</button>
         <button class="btn btn-soft btn-small" id="set-import">Import Save</button>
       </div>
-      <div class="btn-row"><button class="btn btn-soft" id="set-reset" style="color:var(--danger)">Reset Greenhouse</button></div>
-      <div class="btn-row"><button class="btn btn-soft" id="set-how">❓ How to Play</button></div>
+      <div class="btn-row"><button class="btn" id="set-newgame" style="width:100%">🔄 New Game</button></div>
+      <div class="btn-row"><span style="font-size:12px;opacity:.65;text-align:center">Start over from scratch — wipes everything and begins a fresh garden.</span></div>
+      <div class="btn-row"><button class="btn btn-soft btn-small" id="set-how">❓ How to Play</button></div>
       <div class="btn-row"><button class="btn" id="set-close">Done</button></div>`);
     m.querySelector('#set-close').onclick = () => UI.closeModal();
     m.querySelector('#set-how').onclick = () => { UI.closeModal(); UI.howTo(); };
@@ -34,7 +35,7 @@ const Settings = {
     };
     m.querySelector('#set-export').onclick = () => this.exportSave();
     m.querySelector('#set-import').onclick = () => this.importSave();
-    m.querySelector('#set-reset').onclick = () => this.resetAll();
+    m.querySelector('#set-newgame').onclick = () => this.resetAll();
   },
 
   toggleSound(){
@@ -80,9 +81,9 @@ const Settings = {
   },
 
   async resetAll(){
-    const ok = await UI.confirm('Reset Greenhouse?', 'ALL progress will be erased. This cannot be undone!', 'Reset Everything');
+    const ok = await UI.confirm('Start a New Game?', 'ALL progress will be erased and you begin fresh. This cannot be undone!', 'New Game');
     if (!ok) return;
-    const ok2 = await UI.confirm('Are you really sure?', 'Your plants, coins, rooms — everything goes.', 'Yes, Reset');
+    const ok2 = await UI.confirm('Are you really sure?', 'Your plants, coins, rooms — everything goes.', 'Yes, Start Over');
     if (!ok2) return;
     Save.wipe();
     location.reload();
