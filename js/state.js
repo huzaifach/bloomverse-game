@@ -1,0 +1,116 @@
+/* BLOOMVERSE — central state + derived game math. No DOM here except via UI hooks. */
+const S = {
+  data: null,   // {families, orders, rooms, achievements, shop, daily}
+  save: null,   // save object (see save.js defaults)
+
+  /* ---------- data lookups ---------- */
+  family(id){ return this.data.families.find(f => f.id === id); },
+  tierOf(fid, t){ const f = this.family(fid); return f ? f.tiers[t - 1] : null; },
+  artFor(fid, t){ const f = this.family(fid); return `assets/plants/${f.artPrefix}-t${t}.png`; },
+  room(id){ return this.data.rooms.find(r => r.id === id); },
+
+  unlockedFamilies(){
+    return this.data.families.filter(f => {
+      if (f.unlock.type === 'start') return true;
+      return this.save.rooms.includes(f.unlock.room);
+    });
+  },
+  isFamilyUnlocked(fid){
+    const f = this.family(fid);
+    return f.unlock.type === 'start' || this.save.rooms.includes(f.unlock.room);
+  },
+
+  /* ---------- rooms / effects ---------- */
+  hasRoom(id){ return this.save.rooms.includes(id); },
+  effect(key, def){
+    let v = def;
+    for (const rid of this.save.rooms){
+      const r = this.room(rid);
+      if (r && r.effects && r.effects[key] !== undefined) v = r.effects[key];
+    }
+    return v;
+  },
+
+  solariumSlotCount(){ return 6 + (this.effect('solariumSlotsBonus', 0) || 0); },
+  spawnerCooldownSec(fid){
+    const base = this.family(fid).spawnerCooldownSec;
+    return Math.round(base * (this.effect('spawnerCooldownMult', 1) || 1));
+  },
+
+  /* ---------- economy ---------- */
+  dewPerSecond(){
+    let rate = 0;
+    const spr = 1 + 0.20 * this.save.upgrades.sprinkler;
+    const pots = 1 + 0.25 * this.save.upgrades.pots;
+    const allM = this.effect('allDewMult', 1) || 1;
+    const sucM = this.effect('succulentDewMult', 1) || 1;
+    for (const p of this.save.solarium){
+      if (!p) continue;
+      const t = this.tierOf(p.f, p.t);
+      let r = t.dewPerSec * spr * pots * allM;
+      if (p.f === 'crystal-succulents') r *= sucM;
+      rate += r;
+    }
+    if (this.save.boosts.dewBoostUntil > Date.now()) rate *= 2;
+    return rate;
+  },
+
+  /* ---------- currencies (also bump HUD) ---------- */
+  addCoins(n){
+    this.save.coins = Math.max(0, Math.round((this.save.coins + n) * 100) / 100);
+    this.save.stats.lifetimeCoins += Math.max(0, n);
+    UI.bumpPill('pill-coins'); UI.refreshHUD();
+  },
+  addDew(n){
+    this.save.dewdrops = Math.max(0, Math.round((this.save.dewdrops + n) * 100) / 100);
+    this.save.stats.lifetimeDew += Math.max(0, n);
+    UI.bumpPill('pill-dew'); UI.refreshHUD();
+  },
+  addRenown(n){
+    this.save.renown += n;
+    this.save.stats.lifetimeRenown += n;
+    UI.bumpPill('pill-renown'); UI.refreshHUD();
+    Rooms.checkUnlocks();
+  },
+  addSeeds(n){
+    this.save.seeds = Math.max(0, this.save.seeds + n);
+    UI.bumpPill('pill-seeds'); UI.refreshHUD();
+  },
+
+  /* ---------- board helpers ---------- */
+  emptyCell(){ return this.save.board.findIndex(c => !c); },
+  boardCount(fid, tier){
+    return this.save.board.reduce((n, c) => n + ((c && c.f === fid && c.t === tier) ? 1 : 0), 0);
+  },
+  boardHas(fid, tier, n){ return this.boardCount(fid, tier) >= n; },
+
+  takePlants(fid, tier, n){
+    // removes n matching plants from board (lowest indices first), returns taken count
+    let taken = 0;
+    for (let i = 0; i < 25 && taken < n; i++){
+      const c = this.save.board[i];
+      if (c && c.f === fid && c.t === tier){ this.save.board[i] = null; taken++; }
+    }
+    return taken;
+  },
+
+  discover(fid, tier){
+    const arr = this.save.codex[fid];
+    if (arr && !arr[tier - 1]){
+      const first = !arr.some(Boolean);
+      arr[tier - 1] = true;
+      this.save.stats.maxTier = Math.max(this.save.stats.maxTier, tier);
+      if (first) UI.toast(`New discovery: ${this.family(fid).name}!`);
+      Codex.refresh();
+      Achievements.check();
+    }
+  },
+
+  codexPct(){
+    let got = 0, total = 0;
+    for (const f of this.data.families){
+      for (let i = 0; i < 8; i++){ total++; if (this.save.codex[f.id][i]) got++; }
+    }
+    return total ? Math.round(got / total * 100) : 0;
+  }
+};
