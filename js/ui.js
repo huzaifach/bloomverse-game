@@ -57,6 +57,44 @@ const UI = {
     el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump');
   },
 
+  /* Number badges on tabs: show the player where action is waiting. */
+  updateBadges(){
+    const set = (screen, n) => {
+      const tab = document.querySelector(`#tabs .tab[data-screen="${screen}"]`);
+      if (!tab) return;
+      let b = tab.querySelector('.tab-badge');
+      if (n > 0){
+        if (!b){ b = document.createElement('span'); b.className = 'tab-badge'; tab.appendChild(b); }
+        b.textContent = n > 9 ? '9+' : n;
+      } else if (b) b.remove();
+    };
+    // garden: mergeable pairs waiting
+    let pairs = 0;
+    try {
+      const seen = {}, b = S.save.board;
+      for (let i = 0; i < b.length; i++){
+        const p = b[i];
+        if (!p || p.t >= 8) continue;
+        const k = p.f + ':' + p.t;
+        if (seen[k] !== undefined){ pairs++; delete seen[k]; }
+        else seen[k] = i;
+      }
+    } catch(e){}
+    set('board', pairs);
+    // orders: fulfillable right now
+    let ready = 0;
+    try { ready = (S.save.orders || []).filter(o => Orders.canFulfill(o)).length; } catch(e){}
+    set('orders', ready);
+    // solarium: tappable dew bubbles
+    let bub = 0;
+    try { bub = (Solarium.bubbles || []).length; } catch(e){}
+    set('solarium', bub);
+    // haven: daily reward unclaimed
+    let daily = 0;
+    try { daily = (Daily.dayStr() !== (S.save.daily.lastClaim || '')) ? 1 : 0; } catch(e){}
+    set('haven', daily);
+  },
+
   refreshSoundIcon(){
     document.getElementById('btn-sound').innerHTML = S.save.settings.sound ? this.ICONS.soundOn : this.ICONS.soundOff;
   },

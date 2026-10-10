@@ -84,8 +84,14 @@ body::after{top:16%;left:-140px;font-size:44px;animation-duration:70s;animation-
 @keyframes floatY{50%{transform:translateY(-5px)}}
 .plant{width:100%;height:100%;display:flex;align-items:center;justify-content:center;cursor:grab;position:relative}
 .plant img{width:88%;height:88%;object-fit:contain;pointer-events:none;
-  animation:sway 3.8s ease-in-out infinite;transform-origin:50% 92%;filter:drop-shadow(0 3px 2px rgba(46,110,32,.25))}
-@keyframes sway{0%,100%{transform:rotate(-3.5deg)}50%{transform:rotate(3.5deg)}}
+  animation:sway 2.8s ease-in-out infinite;transform-origin:50% 92%;filter:drop-shadow(0 3px 2px rgba(46,110,32,.25))}
+@keyframes sway{0%,100%{transform:rotate(-7deg) translateY(0)}50%{transform:rotate(7deg) translateY(-5px)}}
+.cell.merge-hint{outline:4px solid var(--sun);animation:hintPulse .9s infinite;z-index:2}
+@keyframes hintPulse{0%,100%{box-shadow:0 0 4px var(--sun);transform:scale(1)}50%{box-shadow:0 0 20px var(--sun);transform:scale(1.07)}}
+.tab{position:relative}
+.tab-badge{position:absolute;top:2px;right:8px;background:#FF5252;color:#fff;font-size:11px;font-weight:800;
+  border-radius:999px;min-width:20px;height:20px;display:flex;align-items:center;justify-content:center;
+  border:2px solid #fff;box-shadow:0 2px 4px rgba(0,0,0,.25);padding:0 4px}
 .plant.spawn img{animation:popIn .45s cubic-bezier(.2,1.6,.4,1)}
 @keyframes popIn{from{transform:scale(0) rotate(-30deg)}}
 .plant.pop img{animation:mergePop .55s cubic-bezier(.2,1.8,.4,1)}

@@ -71,6 +71,7 @@ const App = {
     Achievements.render();
     UI.refreshHUD();
     UI.refreshSoundIcon();
+    UI.updateBadges();
 
     document.getElementById('btn-daily').addEventListener('click', () => Daily.openManual());
     document.getElementById('btn-share').addEventListener('click', () => Share.share());
@@ -208,7 +209,7 @@ const App = {
     const dewEl = document.getElementById('pill-dew');
     if (dewEl) dewEl.innerHTML = UI.ICONS.dew + '<span>' + UI.fmt(S.save.dewdrops) + '</span>';
     // bloom burst cooldown refresh (every ~5s)
-    if (S.save.stats.playtimeSec % 5 === 0) Board.renderTopBar();
+    if (S.save.stats.playtimeSec % 5 === 0){ Board.renderTopBar(); UI.updateBadges(); }
     // day/night check every minute
     if (S.save.stats.playtimeSec % 60 === 0) this.dayNight();
     if (++this.saveTimer >= 15){ this.saveTimer = 0; S.save.lastSeen = Date.now(); Save.write(S.save); }

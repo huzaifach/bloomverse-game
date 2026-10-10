@@ -39,6 +39,20 @@ const Board = {
       }
       grid.appendChild(cell);
     }
+    // subtle merge hints: pulse every twin of the selected plant
+    if (this.selected >= 0){
+      const s = S.save.board[this.selected];
+      if (s && s.t < 8){
+        for (let i = 0; i < n * n; i++){
+          if (i === this.selected) continue;
+          const p = S.save.board[i];
+          if (p && p.f === s.f && p.t === s.t){
+            const c = grid.children[i];
+            if (c) c.classList.add('merge-hint');
+          }
+        }
+      }
+    }
     this.renderTopBar();
   },
 
@@ -51,7 +65,7 @@ const Board = {
       wrap.insertBefore(bar, wrap.firstChild);
     }
     const burstCd = Math.max(0, Math.ceil(((S.save.bloomBurstAt || 0) + 90000 - Date.now()) / 1000));
-    const canBurst = burstCd <= 0 && this.findMergePair() >= 0;
+    const canBurst = burstCd <= 0 && this.findMergePair() !== -1;
     bar.innerHTML = `<div class="lvl">🌱 Garden Lv ${S.gardenLevel()}</div>
       <button id="bloom-burst" ${canBurst ? '' : 'disabled'}>💥 Bloom Burst${burstCd > 0 ? ` (${burstCd}s)` : ''}</button>`;
     const bb = document.getElementById('bloom-burst');
@@ -361,7 +375,7 @@ const Board = {
 
   bloomBurst(){
     const pair = this.findMergePair();
-    if (pair < 0){ UI.toast('No merges available right now.'); return; }
+    if (pair === -1){ UI.toast('No merges available right now.'); return; }
     S.save.bloomBurstAt = Date.now();
     Audio.sfx('fanfare');
     UI.banner('💥 BLOOM BURST! 💥');
