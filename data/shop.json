@@ -1,0 +1,57 @@
+{
+  "items": [
+    {
+      "cost": {
+        "amount": 500,
+        "currency": "dewdrops"
+      },
+      "desc": "Doubles all Dewdrop earnings for 10 minutes.",
+      "effect": {
+        "durationMin": 10,
+        "mult": 2,
+        "type": "dewBoost"
+      },
+      "id": "sunlight-burst",
+      "name": "Sunlight Burst"
+    },
+    {
+      "cost": {
+        "amount": 150,
+        "currency": "coins"
+      },
+      "desc": "A magical rainbow shower \u2014 every plant in the garden becomes overjoyed (+25% sell value).",
+      "effect": {
+        "type": "joyfulRain"
+      },
+      "id": "joyful-rain",
+      "name": "Joyful Rain"
+    },
+    {
+      "cost": {
+        "amount": 300,
+        "currency": "coins"
+      },
+      "desc": "Three mystery seeds, ready to sprout surprises.",
+      "effect": {
+        "count": 3,
+        "type": "addSeeds"
+      },
+      "id": "seed-bundle",
+      "name": "Mystery Seed Bundle"
+    },
+    {
+      "cost": {
+        "amount": 800,
+        "currency": "dewdrops"
+      },
+      "desc": "Your next 10 merges grant double coins when sold or ordered.",
+      "effect": {
+        "merges": 10,
+        "mult": 2,
+        "type": "mergeValueBoost"
+      },
+      "id": "golden-trowel",
+      "name": "Golden Trowel"
+    }
+  ]
+}

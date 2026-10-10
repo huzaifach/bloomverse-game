@@ -1,0 +1,78 @@
+{
+  "rooms": [
+    {
+      "desc": "Where it all begins. Warm soil, old wood, endless possibility.",
+      "effects": {},
+      "flavor": "Your grandmother's shed, inherited with love.",
+      "id": "potting-shed",
+      "name": "The Potting Shed",
+      "renownCost": 0
+    },
+    {
+      "desc": "Humid glass halls where seeds sprout in a hurry.",
+      "effects": {
+        "seedCostMult": 0.75,
+        "happinessGainMult": 1.5
+      },
+      "flavor": "Everything grows faster under this glass.",
+      "id": "fern-conservatory",
+      "name": "The Fern Conservatory",
+      "renownCost": 15
+    },
+    {
+      "desc": "A glittering grotto that adores succulents.",
+      "effects": {
+        "succulentDewMult": 2.0,
+        "succulentOrderMult": 1.25
+      },
+      "flavor": "The crystals hum to the succulents. They answer with Dewdrops.",
+      "id": "crystal-cave",
+      "name": "The Crystal Cave",
+      "renownCost": 30
+    },
+    {
+      "desc": "A starlit dome. Unlocks Astral Flora and two extra solarium slots.",
+      "effects": {
+        "allDewMult": 1.1,
+        "solariumSlotsBonus": 2,
+        "unlockFamily": "astral-flora"
+      },
+      "flavor": "At night the glass shows the real sky. The plants noticed first.",
+      "id": "astral-solarium",
+      "name": "The Astral Solarium",
+      "renownCost": 60
+    },
+    {
+      "id": "ember-forge",
+      "name": "The Ember Forge",
+      "renownCost": 40,
+      "desc": "A forge of gentle flame where fire-flowers are born.",
+      "flavor": "Walls of warm ember-glass. The air smells like cinnamon and courage.",
+      "effects": {}
+    },
+    {
+      "id": "tide-pools",
+      "name": "The Tide Pools",
+      "renownCost": 80,
+      "desc": "Moonlit pools where ocean gardens grow.",
+      "flavor": "Cool blue grottos. You can hear the sea breathing.",
+      "effects": {}
+    },
+    {
+      "id": "storm-spire",
+      "name": "The Storm Spire",
+      "renownCost": 120,
+      "desc": "A tower that catches lightning for its flowers.",
+      "flavor": "Crackling crystal rods. The petals drink the storm.",
+      "effects": {}
+    },
+    {
+      "id": "honey-hollow",
+      "name": "The Honey Hollow",
+      "renownCost": 160,
+      "desc": "A golden hive-hall of endless sweetness.",
+      "flavor": "Amber light drips like honey. Everything glows.",
+      "effects": {}
+    }
+  ]
+}

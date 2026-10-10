@@ -1,0 +1,680 @@
+{
+  "milestones": [
+    {
+      "desc": "Plant your very first sprout",
+      "id": "first-sprout",
+      "name": "First Sprout",
+      "pip": "Look! Your very first sprout! I'll remember this day forever.",
+      "reward": {
+        "coins": 50
+      },
+      "stat": "planted",
+      "target": 1
+    },
+    {
+      "desc": "Merge two plants for the first time",
+      "id": "first-merge",
+      "name": "First Merge",
+      "pip": "You merged! Did you see their happy little faces?",
+      "reward": {
+        "coins": 100
+      },
+      "stat": "merges",
+      "target": 1
+    },
+    {
+      "desc": "Merge 10 times",
+      "id": "merges-10",
+      "name": "Getting the Hang",
+      "pip": "Ten merges! You're a natural, gardener.",
+      "reward": {
+        "coins": 150,
+        "seeds": 1
+      },
+      "stat": "merges",
+      "target": 10
+    },
+    {
+      "desc": "Fulfill your first order",
+      "id": "first-order",
+      "name": "Open for Business",
+      "pip": "A happy visitor! They'll tell all their friends about us.",
+      "reward": {
+        "coins": 200
+      },
+      "stat": "orders",
+      "target": 1
+    },
+    {
+      "desc": "Grow a Tier 4 plant",
+      "id": "tier4",
+      "name": "Budding Talent",
+      "pip": "Tier 4! This garden is really coming alive.",
+      "reward": {
+        "coins": 300
+      },
+      "stat": "maxTier",
+      "target": 4
+    },
+    {
+      "desc": "Fulfill 5 orders",
+      "id": "orders-5",
+      "name": "Reliable Grower",
+      "pip": "Five happy visitors! Here's a mystery seed for you.",
+      "reward": {
+        "seeds": 1
+      },
+      "stat": "orders",
+      "target": 5
+    },
+    {
+      "desc": "Expand the garden to 5x5",
+      "id": "expand-5",
+      "name": "Room to Grow",
+      "pip": "More room! The plants are doing a happy dance.",
+      "reward": {
+        "dewdrops": 300
+      },
+      "stat": "gridSize",
+      "target": 5
+    },
+    {
+      "desc": "Grow a Tier 5 plant",
+      "id": "tier5",
+      "name": "Halfway to Magic",
+      "pip": "Tier 5! Even the butterflies stopped to stare.",
+      "reward": {
+        "coins": 600
+      },
+      "stat": "maxTier",
+      "target": 5
+    },
+    {
+      "desc": "Merge 50 times",
+      "id": "merges-50",
+      "name": "Merge Master",
+      "pip": "Fifty merges! Your fingers must be part flower by now.",
+      "reward": {
+        "coins": 400,
+        "seeds": 2
+      },
+      "stat": "merges",
+      "target": 50
+    },
+    {
+      "desc": "Fulfill 10 orders",
+      "id": "orders-10",
+      "name": "Visitor Favorite",
+      "pip": "Ten orders! The whole town is talking about your garden.",
+      "reward": {
+        "coins": 800
+      },
+      "stat": "orders",
+      "target": 10
+    },
+    {
+      "desc": "Expand the garden to 6x6",
+      "id": "expand-6",
+      "name": "Grand Garden",
+      "pip": "Six by six! This is officially a GRAND garden now.",
+      "reward": {
+        "dewdrops": 600
+      },
+      "stat": "gridSize",
+      "target": 6
+    },
+    {
+      "desc": "Grow a Tier 6 plant",
+      "id": "tier6",
+      "name": "Greenhouse Royalty",
+      "pip": "Tier 6! I got goosebumps on my wings!",
+      "reward": {
+        "coins": 1200,
+        "seeds": 1
+      },
+      "stat": "maxTier",
+      "target": 6
+    },
+    {
+      "desc": "Merge 100 times",
+      "id": "merges-100",
+      "name": "Century of Blooms",
+      "pip": "One hundred merges! Legendary gardener status: achieved.",
+      "reward": {
+        "coins": 1500
+      },
+      "stat": "merges",
+      "target": 100
+    },
+    {
+      "desc": "Unlock your first Renown room",
+      "id": "room-1",
+      "name": "New Horizons",
+      "pip": "A whole new room! The garden keeps surprising me.",
+      "reward": {
+        "dewdrops": 400
+      },
+      "stat": "rooms",
+      "target": 1
+    },
+    {
+      "desc": "Grow a Tier 7 plant",
+      "id": "tier7",
+      "name": "Almost Mythical",
+      "pip": "Tier 7... I can feel the magic from here.",
+      "reward": {
+        "coins": 2500
+      },
+      "stat": "maxTier",
+      "target": 7
+    },
+    {
+      "desc": "Fulfill 25 orders",
+      "id": "orders-25",
+      "name": "Town Treasure",
+      "pip": "Twenty-five happy visitors! You're the town treasure.",
+      "reward": {
+        "seeds": 3
+      },
+      "stat": "orders",
+      "target": 25
+    },
+    {
+      "desc": "Expand the garden to 7x7",
+      "id": "expand-7",
+      "name": "Botanical Wonder",
+      "pip": "Seven by seven! Botanists will write books about this place.",
+      "reward": {
+        "dewdrops": 1000
+      },
+      "stat": "gridSize",
+      "target": 7
+    },
+    {
+      "desc": "Create your first hybrid",
+      "id": "first-hybrid",
+      "name": "Mad Botanist",
+      "pip": "A HYBRID! You mixed two families and made pure magic!",
+      "reward": {
+        "coins": 3000
+      },
+      "stat": "hybrids",
+      "target": 1
+    },
+    {
+      "desc": "Grow a Tier 8 plant",
+      "id": "tier8",
+      "name": "Mythical Bloom",
+      "pip": "TIER EIGHT! The rarest bloom! I'm crying happy dewdrops!",
+      "reward": {
+        "coins": 5000,
+        "dewdrops": 1000
+      },
+      "stat": "maxTier",
+      "target": 8
+    },
+    {
+      "desc": "Merge 250 times",
+      "id": "merges-250",
+      "name": "Merge Legend",
+      "pip": "Two hundred and fifty merges. The plants tell stories about you.",
+      "reward": {
+        "coins": 4000
+      },
+      "stat": "merges",
+      "target": 250
+    },
+    {
+      "desc": "Unlock all Renown rooms",
+      "id": "rooms-all",
+      "name": "Grand Curator",
+      "pip": "Every room unlocked! This haven is truly complete.",
+      "reward": {
+        "dewdrops": 2000
+      },
+      "stat": "rooms",
+      "target": 4
+    },
+    {
+      "desc": "Expand the garden to 8x8",
+      "id": "expand-8",
+      "name": "Infinite Garden",
+      "pip": "Eight by eight! The biggest garden in Bloomverse history!",
+      "reward": {
+        "dewdrops": 3000
+      },
+      "stat": "gridSize",
+      "target": 8
+    },
+    {
+      "desc": "Fulfill 50 orders",
+      "id": "orders-50",
+      "name": "Beloved by All",
+      "pip": "Fifty orders! They come from far and wide just for your flowers.",
+      "reward": {
+        "coins": 2000,
+        "seeds": 5
+      },
+      "stat": "orders",
+      "target": 50
+    },
+    {
+      "desc": "Grow all four Tier 8 plants",
+      "id": "master",
+      "name": "Bloomverse Master",
+      "pip": "ALL FOUR mythical blooms... You did it. This garden is a legend now.",
+      "reward": {
+        "coins": 15000,
+        "dewdrops": 5000
+      },
+      "stat": "tier8Count",
+      "target": 4
+    },
+    {
+      "id": "golden-1",
+      "name": "Touch of Gold",
+      "desc": "Grow your first golden plant",
+      "stat": "golden",
+      "target": 1,
+      "reward": {
+        "coins": 1000
+      },
+      "pip": "A GOLDEN plant! It sparkles like morning dew!"
+    },
+    {
+      "id": "golden-10",
+      "name": "Gold Rush",
+      "desc": "Grow 10 golden plants",
+      "stat": "golden",
+      "target": 10,
+      "reward": {
+        "coins": 5000,
+        "seeds": 2
+      },
+      "pip": "Ten golden plants! You are officially rich in sunshine!"
+    },
+    {
+      "id": "merges-500",
+      "name": "Merge Machine",
+      "desc": "Merge 500 times",
+      "stat": "merges",
+      "target": 500,
+      "reward": {
+        "coins": 8000
+      },
+      "pip": "Five hundred merges! Your hands are magic!"
+    },
+    {
+      "id": "merges-1000",
+      "name": "Merge Immortal",
+      "desc": "Merge 1,000 times",
+      "stat": "merges",
+      "target": 1000,
+      "reward": {
+        "coins": 20000,
+        "seeds": 5
+      },
+      "pip": "ONE THOUSAND merges! I am speechless!"
+    },
+    {
+      "id": "orders-100",
+      "name": "Century of Smiles",
+      "desc": "Fulfill 100 orders",
+      "stat": "orders",
+      "target": 100,
+      "reward": {
+        "coins": 10000
+      },
+      "pip": "One hundred happy visitors! Legendary!"
+    },
+    {
+      "id": "grand-1",
+      "name": "Grand Entrance",
+      "desc": "Fill your first grand order",
+      "stat": "grandOrders",
+      "target": 1,
+      "reward": {
+        "coins": 3000
+      },
+      "pip": "A GRAND order! Only master gardeners get those!"
+    },
+    {
+      "id": "grand-10",
+      "name": "Grandmaster",
+      "desc": "Fill 10 grand orders",
+      "stat": "grandOrders",
+      "target": 10,
+      "reward": {
+        "coins": 12000
+      },
+      "pip": "Ten grand orders! The whole kingdom knows your name!"
+    },
+    {
+      "id": "prestige-1",
+      "name": "Born Again",
+      "desc": "Perform your first Rebirth",
+      "stat": "prestiges",
+      "target": 1,
+      "reward": {
+        "dewdrops": 5000
+      },
+      "pip": "Rebirth! A brand new garden, with all your wisdom kept!"
+    },
+    {
+      "id": "challenge-7",
+      "name": "Week of Wonders",
+      "desc": "Finish 7 daily challenges",
+      "stat": "challenges",
+      "target": 7,
+      "reward": {
+        "coins": 10000,
+        "seeds": 5
+      },
+      "pip": "Seven daily challenges! Pip is SO proud of you!"
+    },
+    {
+      "id": "hybrids-5",
+      "name": "Hybrid Herd",
+      "desc": "Create 5 hybrids",
+      "stat": "hybrids",
+      "target": 5,
+      "reward": {
+        "coins": 8000,
+        "dewdrops": 2000
+      },
+      "pip": "Five hybrids! A whole magical family!"
+    },
+    {
+      "id": "dew-1m",
+      "name": "Dew Millionaire",
+      "desc": "Gather 1M lifetime Dewdrops",
+      "stat": "lifetimeDew",
+      "target": 1000000,
+      "reward": {
+        "coins": 5000
+      },
+      "pip": "One MILLION dewdrops! The solarium glows!"
+    },
+    {
+      "id": "coins-1m",
+      "name": "Coin Tycoon",
+      "desc": "Earn 1M lifetime coins",
+      "stat": "lifetimeCoins",
+      "target": 1000000,
+      "reward": {
+        "dewdrops": 5000
+      },
+      "pip": "One MILLION coins! Buy the moon!"
+    },
+    {
+      "id": "level-25",
+      "name": "Seasoned Gardener",
+      "desc": "Reach Garden Level 25",
+      "stat": "gardenLevel",
+      "target": 25,
+      "reward": {
+        "coins": 6000
+      },
+      "pip": "Level 25! The garden bows to you!"
+    },
+    {
+      "id": "level-50",
+      "name": "Living Legend",
+      "desc": "Reach Garden Level 50",
+      "stat": "gardenLevel",
+      "target": 50,
+      "reward": {
+        "coins": 15000,
+        "seeds": 3
+      },
+      "pip": "LEVEL FIFTY! They will sing songs about this garden!"
+    },
+    {
+      "id": "joyful-25",
+      "name": "Pure Joy",
+      "desc": "Have 15 overjoyed plants at once",
+      "stat": "joyful",
+      "target": 15,
+      "reward": {
+        "coins": 4000
+      },
+      "pip": "Fifteen overjoyed plants! This garden radiates happiness!"
+    },
+    {
+      "id": "burst-25",
+      "name": "Burst Enthusiast",
+      "desc": "Use Bloom Burst 25 times",
+      "stat": "bursts",
+      "target": 25,
+      "reward": {
+        "coins": 6000
+      },
+      "pip": "Twenty-five Bloom Bursts! Maximum sparkle achieved!"
+    },
+    {
+      "id": "ember-8",
+      "name": "Lord of Flames",
+      "desc": "Grow an Ember Blooms Tier 8",
+      "stat": "ember8",
+      "target": 1,
+      "reward": {
+        "coins": 8000
+      },
+      "pip": "A Phoenix Inferno! Even the sun is jealous!"
+    },
+    {
+      "id": "tidal-8",
+      "name": "Ocean Master",
+      "desc": "Grow a Tidal Kelps Tier 8",
+      "stat": "tidal8",
+      "target": 1,
+      "reward": {
+        "coins": 12000
+      },
+      "pip": "An Ocean Sovereign! The tides applaud!"
+    },
+    {
+      "id": "storm-8",
+      "name": "Storm Caller",
+      "desc": "Grow a Storm Petals Tier 8",
+      "stat": "storm8",
+      "target": 1,
+      "reward": {
+        "coins": 18000
+      },
+      "pip": "A Storm God Bloom! Thunder roars your name!"
+    },
+    {
+      "id": "honey-8",
+      "name": "Golden Keeper",
+      "desc": "Grow a Honey Blooms Tier 8",
+      "stat": "honey8",
+      "target": 1,
+      "reward": {
+        "coins": 25000,
+        "seeds": 3
+      },
+      "pip": "An Eternal Honey Bloom! Sweetest garden ever!"
+    },
+    {
+      "id": "grove-unlock",
+      "name": "Moonlit Steps",
+      "desc": "Unlock the Moonlit Grove",
+      "stat": "grove",
+      "target": 1,
+      "reward": {
+        "coins": 3000
+      },
+      "pip": "A second garden under the moon! Twice the magic!"
+    },
+    {
+      "id": "grove-8x8",
+      "name": "Twin Paradises",
+      "desc": "Expand the Grove to 8x8",
+      "stat": "groveMax",
+      "target": 1,
+      "reward": {
+        "coins": 10000
+      },
+      "pip": "Two full gardens! You are unstoppable!"
+    },
+    {
+      "id": "weather-4",
+      "name": "Child of Seasons",
+      "desc": "Experience all 4 weathers",
+      "stat": "weathers",
+      "target": 4,
+      "reward": {
+        "coins": 4000
+      },
+      "pip": "Sun, rain, wind and storm \u2014 you have seen them all!"
+    },
+    {
+      "id": "weeds-25",
+      "name": "Weed Whacker",
+      "desc": "Clear 25 weeds",
+      "stat": "weeds",
+      "target": 25,
+      "reward": {
+        "coins": 5000
+      },
+      "pip": "Twenty-five weeds cleared! Spotless!"
+    },
+    {
+      "id": "meteors-20",
+      "name": "Star Catcher",
+      "desc": "Tap 20 meteors",
+      "stat": "meteors",
+      "target": 20,
+      "reward": {
+        "coins": 4000
+      },
+      "pip": "Twenty shooting stars caught! Make a wish!"
+    },
+    {
+      "id": "frogs-3",
+      "name": "Frog Friend Forever",
+      "desc": "Welcome the frog 3 times",
+      "stat": "frogs",
+      "target": 3,
+      "reward": {
+        "coins": 3000
+      },
+      "pip": "Ribbit ribbit! The frog loves you!"
+    },
+    {
+      "id": "party-3",
+      "name": "Party Animal",
+      "desc": "Enjoy 3 dance parties",
+      "stat": "parties",
+      "target": 3,
+      "reward": {
+        "dewdrops": 3000
+      },
+      "pip": "Three dance parties! Best garden ever!"
+    },
+    {
+      "id": "rainbow-5",
+      "name": "Rainbow Chaser",
+      "desc": "See 5 rainbow rains",
+      "stat": "rainbows",
+      "target": 5,
+      "reward": {
+        "coins": 5000
+      },
+      "pip": "Five rainbows! Your luck is legendary!"
+    },
+    {
+      "id": "perks-3",
+      "name": "Blessed Thrice",
+      "desc": "Earn 3 rebirth blessings",
+      "stat": "perks",
+      "target": 3,
+      "reward": {
+        "coins": 6000
+      },
+      "pip": "Three blessings! The garden gods smile on you!"
+    },
+    {
+      "id": "merges-2500",
+      "name": "Merge Titan",
+      "desc": "Merge 2,500 times",
+      "stat": "merges",
+      "target": 2500,
+      "reward": {
+        "coins": 30000,
+        "seeds": 5
+      },
+      "pip": "Two thousand five hundred merges! TITAN!"
+    },
+    {
+      "id": "orders-250",
+      "name": "Town Favorite",
+      "desc": "Fulfill 250 orders",
+      "stat": "orders",
+      "target": 250,
+      "reward": {
+        "coins": 20000
+      },
+      "pip": "Two hundred fifty happy visitors! Incredible!"
+    },
+    {
+      "id": "grand-25",
+      "name": "Grand Legend",
+      "desc": "Fill 25 grand orders",
+      "stat": "grandOrders",
+      "target": 25,
+      "reward": {
+        "coins": 25000
+      },
+      "pip": "Twenty-five grand orders! Royalty material!"
+    },
+    {
+      "id": "level-75",
+      "name": "Garden Sage",
+      "desc": "Reach Garden Level 75",
+      "stat": "gardenLevel",
+      "target": 75,
+      "reward": {
+        "coins": 25000,
+        "seeds": 5
+      },
+      "pip": "Level 75! Sages travel miles to see your garden!"
+    },
+    {
+      "id": "level-100",
+      "name": "Centennial Bloom",
+      "desc": "Reach Garden Level 100",
+      "stat": "gardenLevel",
+      "target": 100,
+      "reward": {
+        "coins": 50000,
+        "seeds": 10
+      },
+      "pip": "LEVEL ONE HUNDRED! This is history!"
+    },
+    {
+      "id": "prestige-3",
+      "name": "Thrice Reborn",
+      "desc": "Perform 3 Rebirths",
+      "stat": "prestiges",
+      "target": 3,
+      "reward": {
+        "dewdrops": 15000
+      },
+      "pip": "Three rebirths! Every life more glorious!"
+    },
+    {
+      "id": "golden-25",
+      "name": "Midas Touch",
+      "desc": "Grow 25 golden plants",
+      "stat": "golden",
+      "target": 25,
+      "reward": {
+        "coins": 12000,
+        "seeds": 3
+      },
+      "pip": "Twenty-five golden plants! Everything you touch shines!"
+    }
+  ]
+}

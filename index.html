@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#FFF6E9">
+<title>Bloomverse: The Botanical Haven</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=10">
+<link rel="icon" href="assets/plants/fh-t4.png">
+</head>
+<body>
+<canvas id="fx"></canvas>
+<div id="daynight"></div>
+<div id="app">
+  <header id="hud">
+    <div class="hud-title">🌿 <span>Bloomverse</span></div>
+    <div class="hud-currencies">
+      <button class="pill" id="pill-coins" title="Coins"></button>
+      <button class="pill" id="pill-dew" title="Dewdrops"></button>
+      <button class="pill" id="pill-renown" title="Renown"></button>
+      <button class="pill" id="pill-seeds" title="Mystery Seeds"></button>
+    </div>
+    <div class="hud-actions">
+      <button class="icon-btn" id="btn-sound" title="Sound"></button>
+    </div>
+  </header>
+
+  <main id="screens">
+    <section id="screen-board" class="screen active">
+      <div id="packet-row"></div>
+      <div id="board-wrap">
+        <div id="grid"></div>
+        <div id="board-hint">Drag two matching plants together to merge them.</div>
+      </div>
+    </section>
+
+    <section id="screen-solarium" class="screen">
+      <div class="solarium-head">
+        <h2>The Solarium</h2>
+        <div class="dew-rate" id="dew-rate"></div>
+      </div>
+      <div id="butterfly-meadow"></div>
+      <div id="solarium-slots"></div>
+      <h3 class="section-title">Greenhouse Upgrades</h3>
+      <div id="upgrade-list"></div>
+    </section>
+
+    <section id="screen-orders" class="screen">
+      <div class="orders-head">
+        <h2>Order Board</h2>
+        <div class="streak" id="order-streak"></div>
+      </div>
+      <div id="order-list"></div>
+      <button class="btn btn-soft" id="btn-reroll">Refresh all orders (50 coins)</button>
+    </section>
+
+    <section id="screen-goals" class="screen">
+      <div class="codex-head">
+        <h2>🎯 Goals</h2>
+        <div class="codex-pct" id="goals-pct"></div>
+      </div>
+      <div id="goals-list"></div>
+    </section>
+
+    <section id="screen-haven" class="screen">
+      <h2 class="section-title">Greenhouse Wings</h2>
+      <div id="room-list"></div>
+      <h2 class="section-title">Seed &amp; Sun Shop</h2>
+      <div id="shop-list"></div>
+      <h2 class="section-title">Achievements</h2>
+      <div id="achievement-list"></div>
+      <h2 class="section-title">Your Greenhouse</h2>
+      <div class="haven-grid">
+        <button class="btn" id="btn-daily">Daily Reward</button>
+        <button class="btn" id="btn-share">Share Your Solarium</button>
+        <button class="btn btn-soft" id="btn-stats">Greenhouse Stats</button>
+        <button class="btn btn-soft" id="btn-settings">Settings</button>
+      </div>
+    </section>
+  </main>
+
+  <nav id="tabs">
+    <button class="tab active" data-screen="board"><span class="tab-ico">🪴</span><span class="tab-label">Garden</span></button>
+    <button class="tab" data-screen="solarium"><span class="tab-ico">☀️</span><span class="tab-label">Solarium</span></button>
+    <button class="tab" data-screen="orders"><span class="tab-ico">📜</span><span class="tab-label">Orders</span></button>
+    <button class="tab" data-screen="goals"><span class="tab-ico">🎯</span><span class="tab-label">Goals</span></button>
+    <button class="tab" data-screen="haven"><span class="tab-ico">🏡</span><span class="tab-label">Haven</span></button>
+  </nav>
+</div>
+
+<div id="drag-ghost"></div>
+<div id="modal-root"></div>
+<div id="toast-root"></div>
+<div id="banner-root"></div>
+<div id="tutorial-root"></div>
+
+<script src="js/state.js?v=10"></script>
+<script src="js/save.js?v=10"></script>
+<script src="js/audio.js?v=10"></script>
+<script src="js/fx.js?v=10"></script>
+<script src="js/ui.js?v=10"></script>
+<script src="js/pip.js?v=10"></script>
+<script src="js/milestones.js?v=10"></script>
+<script src="js/challenge.js?v=10"></script>
+<script src="js/prestige.js?v=10"></script>
+<script src="js/weather.js?v=10"></script>
+<script src="js/events.js?v=10"></script>
+<script src="js/board.js?v=10"></script>
+<script src="js/solarium.js?v=10"></script>
+<script src="js/orders.js?v=10"></script>
+<script src="js/codex.js?v=10"></script>
+<script src="js/rooms.js?v=10"></script>
+<script src="js/shop.js?v=10"></script>
+<script src="js/achievements.js?v=10"></script>
+<script src="js/daily.js?v=10"></script>
+<script src="js/tutorial.js?v=10"></script>
+<script src="js/settings.js?v=10"></script>
+<script src="js/app.js?v=10"></script>
+</body>
+</html>
