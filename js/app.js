@@ -12,7 +12,14 @@ const App = {
         fetch('data/shop.json').then(r => r.json()),
         fetch('data/daily.json').then(r => r.json())
       ]);
-      S.data = { families, orders, rooms, achievements, shop, daily };
+      S.data = {
+        families: families.families,
+        orders: orders,
+        rooms: rooms.rooms,
+        achievements: { items: achievements.achievements },
+        shop: { items: shop.items },
+        daily: daily
+      };
     } catch(e){
       document.body.innerHTML = '<div style="padding:40px;text-align:center;font-family:sans-serif">' +
         '<h2>🌱 Bloomverse could not load its data files.</h2>' +
@@ -60,12 +67,17 @@ const App = {
     document.getElementById('btn-stats').addEventListener('click', () => Haven.stats());
     document.getElementById('btn-settings').addEventListener('click', () => Settings.open());
 
-    this.offlineGains();
-    UI.whenModalFree(() => Daily.check());
-    Tutorial.start();
-
     // Dev/QA hook (documented in README): ?scenario=qa seeds a rich test state.
-    if (location.search.includes('scenario=qa')) this.seedQAScenario();
+    // It also silences first-run tutorial + daily modal so QA screenshots stay clean.
+    const isQA = location.search.includes('scenario=qa');
+    if (isQA){
+      S.save.tutorialDone = true;
+      S.save.daily.lastClaim = Daily.dayStr();
+    }
+    this.offlineGains();
+    if (!isQA) UI.whenModalFree(() => Daily.check());
+    Tutorial.start();
+    if (isQA) this.seedQAScenario();
 
     setInterval(() => this.tick(), 1000);
     Save.write(S.save);
