@@ -118,8 +118,13 @@ const UI = {
     Audio.sfx('click');
     const m = this.modal(`<h2>How to Play</h2>
       <div style="font-weight:600;line-height:1.65;font-size:14px">
-      <p>🌱 <b>Sprout:</b> tap a seed packet to grow a Tier 1 plant.</p>
-      <p>🪴 <b>Merge:</b> drag two identical plants together to evolve them (Tiers 1–8).</p>
+      <p>🌱 <b>Sprout:</b> tap a seed packet to plant instantly — it costs a few coins, no waiting!</p>
+      <p>🪴 <b>Merge:</b> drag two identical plants together to evolve them (Tiers 1–8). Merges in a row build COMBOS!</p>
+      <p>💥 <b>Bloom Burst:</b> the glowing button merges everything on the board at once.</p>
+      <p>💗 <b>Plants are alive:</b> tap them — they giggle! Happy plants (💛) sell for +25%.</p>
+      <p>🧚 <b>Pip:</b> your fairy companion. She celebrates every milestone with free gifts!</p>
+      <p>🔮 <b>Hybrid Lab:</b> cross-breed two Tier 5+ plants of different families (Astral Solarium).</p>
+      <p>🌳 <b>Expand:</b> grow your garden from 4x4 all the way to 8x8!</p>
       <p>📜 <b>Orders:</b> magical visitors request plants. Fill orders for coins, renown &amp; mystery seeds.</p>
       <p>☀️ <b>Solarium:</b> move Tier 4+ plants here to earn Dewdrops — even while you're away.</p>
       <p>🏡 <b>Wings:</b> spend Renown to unlock greenhouse wings with real powers.</p>

@@ -52,6 +52,21 @@ const FX = {
     setTimeout(() => el.remove(), 1150);
   },
 
+  hearts(x, y, n = 5){
+    if (this.reduced) return;
+    const icons = ['💗', '💖', '💛'];
+    for (let i = 0; i < n; i++){
+      const el = document.createElement('div');
+      el.className = 'heart-p';
+      el.textContent = icons[(Math.random() * icons.length) | 0];
+      el.style.left = (x + (Math.random() - 0.5) * 44) + 'px';
+      el.style.top = (y + (Math.random() - 0.5) * 20) + 'px';
+      el.style.animationDelay = (Math.random() * 0.25) + 's';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 1300);
+    }
+  },
+
   pollenTick(){
     if (this.reduced || document.hidden) return;
     if (this.pollen.length < 22 && Math.random() < 0.25){

@@ -1,7 +1,9 @@
-/* BLOOMVERSE — the Potting Table: 5x5 merge board, drag-drop + tap-tap, seed packets. */
+/* BLOOMVERSE V2 — the Garden: dynamic 4x4→8x8 merge board, instant paid seeding,
+   merge combos, Bloom Burst, plant happiness, tap-giggle, board expansion. */
 const Board = {
   selected: -1,
   drag: null,
+  combo: { n: 0, until: 0 },
 
   init(){
     this.renderPackets();
@@ -13,47 +15,106 @@ const Board = {
     grid.addEventListener('contextmenu', e => e.preventDefault());
   },
 
+  size(){ return S.save.gridSize || 4; },
+
   /* ---------- rendering ---------- */
   render(){
+    const n = this.size();
     const grid = document.getElementById('grid');
+    grid.style.setProperty('--n', n);
     grid.innerHTML = '';
-    for (let i = 0; i < 25; i++){
+    for (let i = 0; i < n * n; i++){
       const cell = document.createElement('div');
       cell.className = 'cell'; cell.dataset.i = i;
       const p = S.save.board[i];
       if (p){
         cell.classList.add('filled');
+        if (p.hap >= 80) cell.classList.add('joyful');
         const t = S.tierOf(p.f, p.t);
+        const delay = (-(i * 0.7) % 3.8).toFixed(2);
         cell.innerHTML = `<div class="plant" data-i="${i}">
-            <img src="${S.artFor(p.f, p.t)}" alt="${t.name}" draggable="false">
+            <img src="${S.artFor(p.f, p.t)}" alt="${t.name}" draggable="false" style="animation-delay:${delay}s">
             <span class="tier-badge">${p.t}</span></div>`;
         if (i === this.selected) cell.classList.add('selected');
       }
       grid.appendChild(cell);
     }
+    this.renderTopBar();
+  },
+
+  renderTopBar(){
+    let bar = document.getElementById('garden-level');
+    if (!bar){
+      bar = document.createElement('div');
+      bar.id = 'garden-level';
+      const wrap = document.getElementById('board-wrap');
+      wrap.insertBefore(bar, wrap.firstChild);
+    }
+    const burstCd = Math.max(0, Math.ceil(((S.save.bloomBurstAt || 0) + 90000 - Date.now()) / 1000));
+    const canBurst = burstCd <= 0 && this.findMergePair() >= 0;
+    bar.innerHTML = `<div class="lvl">🌱 Garden Lv ${S.gardenLevel()}</div>
+      <button id="bloom-burst" ${canBurst ? '' : 'disabled'}>💥 Bloom Burst${burstCd > 0 ? ` (${burstCd}s)` : ''}</button>`;
+    const bb = document.getElementById('bloom-burst');
+    if (canBurst) bb.onclick = () => this.bloomBurst();
+    this.renderExpandBtn();
+  },
+
+  renderExpandBtn(){
+    let old = document.getElementById('expand-btn');
+    if (old) old.remove();
+    const n = this.size();
+    if (n >= 8) return;
+    const ex = S.data.expansions.expansions.find(e => e.size === n + 1);
+    if (!ex) return;
+    const btn = document.createElement('button');
+    btn.id = 'expand-btn';
+    btn.className = 'btn btn-gold';
+    const c = ex.cost;
+    const label = `Expand Garden to ${n + 1}x${n + 1} — 🪙${UI.fmt(c.coins)}${c.dewdrops ? ` + 💧${UI.fmt(c.dewdrops)}` : ''}`;
+    btn.textContent = label;
+    btn.disabled = S.save.coins < c.coins || (c.dewdrops && S.save.dewdrops < c.dewdrops);
+    btn.onclick = () => this.expandGarden(ex);
+    document.getElementById('board-wrap').appendChild(btn);
+  },
+
+  expandGarden(ex){
+    const c = ex.cost;
+    if (S.save.coins < c.coins || (c.dewdrops && S.save.dewdrops < c.dewdrops)){
+      Audio.sfx('error'); UI.toast('Not enough resources yet — keep growing!'); return;
+    }
+    S.addCoins(-c.coins);
+    if (c.dewdrops) S.addDew(-c.dewdrops);
+    const oldN = this.size(), newN = ex.size;
+    const oldBoard = S.save.board.slice();
+    S.save.board = new Array(newN * newN).fill(null);
+    for (let i = 0; i < oldBoard.length; i++) S.save.board[i] = oldBoard[i];
+    S.save.gridSize = newN;
+    Audio.sfx('fanfare');
+    UI.banner(`🌳 Garden expanded to ${newN}x${newN}!`);
+    Pip.say(S.data.pip.expansion[(Math.random() * S.data.pip.expansion.length) | 0], 'cheer');
+    FX.burst(innerWidth / 2, innerHeight / 2, 30);
+    this.selected = -1;
+    this.render(); this.renderPackets();
+    document.dispatchEvent(new CustomEvent('bv:expand'));
+    Milestones.check();
+    Save.write(S.save);
   },
 
   renderPackets(){
     const row = document.getElementById('packet-row');
     row.innerHTML = '';
-    const now = Date.now();
     for (const f of S.data.families){
       const unlocked = S.isFamilyUnlocked(f.id);
+      const cost = S.seedCost(f.id);
+      const afford = S.save.coins >= cost;
       const el = document.createElement('div');
-      el.className = 'packet' + (unlocked ? '' : ' locked');
-      const readyAt = S.save.spawners[f.id] || 0;
-      const waiting = unlocked && readyAt > now;
+      el.className = 'packet' + (unlocked ? '' : ' locked') + (unlocked && !afford ? ' cant' : '');
       el.innerHTML = `
         <img src="${S.artFor(f.id, 1)}" alt="${f.name}" draggable="false">
         <div class="pname">${f.name}</div>
-        ${waiting ? `<div class="cool">${Math.ceil((readyAt - now) / 1000)}s</div>
-          <button class="buy" data-buy="${f.id}">⚡${f.instantSproutCoins}</button>` : ''}
-        ${!unlocked ? `<div class="cool">🔒</div>` : ''}`;
-      el.addEventListener('click', e => {
-        const buy = e.target.closest('[data-buy]');
-        if (buy){ e.stopPropagation(); this.instantSprout(buy.dataset.buy); return; }
-        this.packetTap(f.id);
-      });
+        ${unlocked ? `<div class="cost">🪙${cost}</div>` : `<div class="cost">🔒</div>`}`;
+      el.title = unlocked ? `Tap to plant instantly — ${cost} coins, no waiting!` : 'Unlock in the Astral Solarium wing';
+      el.addEventListener('click', () => this.packetTap(f.id));
       row.appendChild(el);
     }
   },
@@ -65,56 +126,38 @@ const Board = {
     return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
   },
 
-  /* ---------- packets ---------- */
+  /* ---------- instant paid seeding (no waiting, ever) ---------- */
   packetTap(fid){
     Audio.unlock();
     if (!S.isFamilyUnlocked(fid)){
       Audio.sfx('error');
-      const f = S.family(fid);
-      UI.toast(`${f.name} unlock in the Astral Solarium wing (60 Renown).`);
+      UI.toast(`${S.family(fid).name} unlock in the Astral Solarium wing (60 Renown).`);
       return;
     }
-    const now = Date.now();
-    if ((S.save.spawners[fid] || 0) > now){
-      const s = Math.ceil((S.save.spawners[fid] - now) / 1000);
-      Audio.sfx('click');
-      UI.toast(`Seeds resting… ready in ${s}s (or tap ⚡ for instant).`);
-      return;
-    }
-    this.doSprout(fid, false);
-  },
-
-  instantSprout(fid){
-    Audio.unlock();
-    const f = S.family(fid);
-    if (S.save.coins < f.instantSproutCoins){
-      Audio.sfx('error'); UI.toast(`Need ${f.instantSproutCoins} coins for instant sprout.`);
+    const cost = S.seedCost(fid);
+    if (S.save.coins < cost){
+      Audio.sfx('error'); UI.toast(`Need ${cost} coins to plant. Fill an order or sell a plant!`);
       return;
     }
     if (S.emptyCell() < 0){
       Audio.sfx('error'); UI.toast('Garden is full! Merge, sell or move plants first.');
       return;
     }
-    S.addCoins(-f.instantSproutCoins);
-    this.doSprout(fid, true);
-  },
-
-  doSprout(fid, instant){
+    S.addCoins(-cost);
     const cell = S.emptyCell();
-    if (cell < 0){ Audio.sfx('error'); UI.toast('Garden is full! Merge, sell or move plants first.'); return; }
-    S.save.board[cell] = { f: fid, t: 1 };
-    S.save.spawners[fid] = Date.now() + S.spawnerCooldownSec(fid) * 1000;
+    S.save.board[cell] = { f: fid, t: 1, hap: 20 };
     S.discover(fid, 1);
     S.save.stats.sprouts++;
     Audio.sfx('sprout');
     this.selected = -1;
     this.render(); this.renderPackets();
-    UI.refreshHUD();
     const cellEl = document.querySelector(`.cell[data-i="${cell}"] .plant`);
     if (cellEl) cellEl.classList.add('spawn');
     const r = this.cellRect(cell);
-    FX.burst(r.x, r.y, 8, { color: '#8FAE8B' });
+    FX.burst(r.x, r.y, 10, { color: '#8FE063' });
+    FX.floatText(r.x, r.y - 24, S.tierOf(fid, 1).name, '#2E7D32');
     document.dispatchEvent(new CustomEvent('bv:sprout'));
+    Milestones.check();
     Achievements.check();
     Save.write(S.save);
   },
@@ -179,15 +222,48 @@ const Board = {
   onTap(i){
     Audio.sfx('click');
     if (this.selected === -1){
-      if (S.save.board[i]){ this.selected = i; this.render(); }
+      if (S.save.board[i]){
+        this.selected = i;
+        const cellEl = document.querySelector(`.cell[data-i="${i}"] .plant`);
+        if (cellEl){ cellEl.classList.remove('giggle'); void cellEl.offsetWidth; cellEl.classList.add('giggle'); }
+        this.render();
+      }
     } else if (this.selected === i){
-      this.selected = -1; this.render();
+      this.selected = -1;
+      this.giggle(i);
       this.plantAction(i);
     } else {
       const from = this.selected;
       this.selected = -1;
       this.resolveDrop(from, i);
     }
+  },
+
+  /* ---------- plants are alive: tap → giggle ---------- */
+  giggle(i){
+    const p = S.save.board[i];
+    if (!p) return;
+    const now = Date.now();
+    if (p._giggleAt && now - p._giggleAt < 2500) return; // don't spam
+    p._giggleAt = now;
+    p.hap = Math.min(100, (p.hap || 0) + Math.round(10 * S.hapMult()));
+    const cellEl = document.querySelector(`.cell[data-i="${i}"] .plant`);
+    if (cellEl){
+      cellEl.classList.remove('giggle'); void cellEl.offsetWidth; cellEl.classList.add('giggle');
+      const bub = document.createElement('div');
+      bub.className = 'giggle-bub';
+      const fam = S.data.giggles.family[p.f], gen = S.data.giggles.generic;
+      const pool = Math.random() < 0.45 && fam ? fam : gen;
+      bub.textContent = pool[(Math.random() * pool.length) | 0];
+      cellEl.appendChild(bub);
+      setTimeout(() => bub.remove(), 1450);
+    }
+    const r = this.cellRect(i);
+    FX.hearts(r.x, r.y - 30);
+    Audio.sfx('bubble');
+    document.dispatchEvent(new CustomEvent('bv:giggle'));
+    if (p.hap >= 80) this.render();
+    Save.write(S.save);
   },
 
   resolveDrop(from, to){
@@ -210,8 +286,26 @@ const Board = {
   doMerge(from, to){
     const a = S.save.board[from];
     const nt = a.t + 1;
-    S.save.board[to] = { f: a.f, t: nt };
+    const now = Date.now();
+    // combo tracking
+    if (now < this.combo.until) this.combo.n++;
+    else this.combo.n = 1;
+    this.combo.until = now + 4000;
+    const comboN = this.combo.n;
+
+    const newHap = Math.min(100, Math.max(a.hap || 0, 40) + Math.round(nt * 4 * S.hapMult()));
+    S.save.board[to] = { f: a.f, t: nt, hap: newHap };
     S.save.board[from] = null;
+    // neighbors feel the joy
+    const n = this.size();
+    const fx = to % n, fy = (to / n) | 0;
+    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++){
+      const nx = fx + dx, ny = fy + dy;
+      if (nx < 0 || ny < 0 || nx >= n || ny >= n) continue;
+      const q = S.save.board[ny * n + nx];
+      if (q) q.hap = Math.min(100, (q.hap || 0) + Math.round(6 * S.hapMult()));
+    }
+
     S.save.stats.merges++;
     S.discover(a.f, nt);
     Audio.sfx('merge', { tier: nt });
@@ -219,8 +313,24 @@ const Board = {
     const cellEl = document.querySelector(`.cell[data-i="${to}"] .plant`);
     if (cellEl) cellEl.classList.add('pop');
     const r = this.cellRect(to);
-    FX.burst(r.x, r.y, 10 + nt * 2);
-    FX.floatText(r.x, r.y - 20, S.tierOf(a.f, nt).name);
+    FX.burst(r.x, r.y, 12 + nt * 3);
+    FX.floatText(r.x, r.y - 20, S.tierOf(a.f, nt).name, '#2E7D32');
+    if (comboN >= 2){
+      const bonus = (comboN - 1) * nt * 3;
+      S.addCoins(bonus);
+      const tag = document.createElement('div');
+      tag.className = 'combo-tag';
+      tag.textContent = `COMBO ×${comboN}! +${bonus}`;
+      tag.style.left = r.x + 'px'; tag.style.top = (r.y - 60) + 'px';
+      document.body.appendChild(tag);
+      setTimeout(() => tag.remove(), 850);
+      Audio.sfx('coin');
+    }
+    if (comboN >= 3){
+      Pip.say(S.data.pip.big_merge[(Math.random() * S.data.pip.big_merge.length) | 0], 'cheer', 2500);
+    } else if (Math.random() < 0.25){
+      Pip.say(S.data.pip.merge[(Math.random() * S.data.pip.merge.length) | 0], 'wave', 2200);
+    }
     // golden merge surprise (5%)
     if (Math.random() < 0.05){
       const bonus = S.tierOf(a.f, nt).sellCoins;
@@ -230,8 +340,54 @@ const Board = {
       UI.banner('✨ Golden Merge! ✨');
     }
     document.dispatchEvent(new CustomEvent('bv:merge'));
-    UI.refreshHUD();
+    this.renderPackets();
+    Milestones.check();
     Achievements.check();
+    Save.write(S.save);
+  },
+
+  findMergePair(){
+    const b = S.save.board;
+    const seen = {};
+    for (let i = 0; i < b.length; i++){
+      const p = b[i];
+      if (!p || p.t >= 8) continue;
+      const k = p.f + ':' + p.t;
+      if (seen[k] !== undefined) return [seen[k], i];
+      seen[k] = i;
+    }
+    return -1;
+  },
+
+  bloomBurst(){
+    const pair = this.findMergePair();
+    if (pair < 0){ UI.toast('No merges available right now.'); return; }
+    S.save.bloomBurstAt = Date.now();
+    Audio.sfx('fanfare');
+    UI.banner('💥 BLOOM BURST! 💥');
+    Pip.say('WATCH THIS! Everything merges at ONCE!', 'cheer', 3000);
+    const merges = [];
+    const used = new Set();
+    const b = S.save.board;
+    const byKey = {};
+    for (let i = 0; i < b.length; i++){
+      const p = b[i];
+      if (!p || p.t >= 8 || used.has(i)) continue;
+      const k = p.f + ':' + p.t;
+      if (byKey[k] !== undefined && !used.has(byKey[k])){
+        merges.push([byKey[k], i]);
+        used.add(byKey[k]); used.add(i);
+        delete byKey[k];
+      } else byKey[k] = i;
+    }
+    merges.forEach(([from, to], ix) => {
+      setTimeout(() => {
+        const a = S.save.board[from], bb = S.save.board[to];
+        if (a && bb && a.f === bb.f && a.t === bb.t && a.t < 8) this.doMerge(from, to);
+        if (ix === merges.length - 1) this.renderTopBar();
+      }, ix * 160);
+    });
+    this.renderTopBar();
     Save.write(S.save);
   },
 
@@ -240,14 +396,17 @@ const Board = {
     const p = S.save.board[i];
     if (!p) return;
     const t = S.tierOf(p.f, p.t), f = S.family(p.f);
+    const v = S.sellValueOf(p);
     const canSolarium = p.t >= 4 && S.save.solarium.slice(0, S.solariumSlotCount()).some(s => !s);
+    const mood = p.hap >= 80 ? '💛 Overjoyed! (+25% sell value)' : p.hap >= 40 ? '😊 Happy' : '😐 Content';
     const m = UI.modal(`<h2>${t.name}</h2>
       <div class="m-plant"><img src="${S.artFor(p.f, p.t)}"><div>
         <div style="font-weight:800">${f.name} · Tier ${p.t}/8</div>
         <div style="font-size:13px;color:var(--muted);font-weight:600">${t.desc}</div>
-        <div style="font-size:13px;font-weight:700;margin-top:4px">Sells for ${UI.fmt(t.sellCoins)} coins · ${t.dewPerSec}/s in Solarium</div>
+        <div style="font-size:13px;font-weight:700;margin-top:4px">Mood: ${mood}</div>
+        <div style="font-size:13px;font-weight:700">Sells for ${UI.fmt(v)} coins · ${t.dewPerSec}/s in Solarium</div>
       </div></div>
-      <div class="btn-row"><button class="btn btn-gold" id="pa-sell">Sell +${UI.fmt(t.sellCoins)}</button></div>
+      <div class="btn-row"><button class="btn btn-gold" id="pa-sell">Sell +${UI.fmt(v)}</button></div>
       <div class="btn-row"><button class="btn btn-soft" id="pa-sol" ${canSolarium ? '' : 'disabled'}>Move to Solarium${p.t < 4 ? ' (Tier 4+)' : ''}</button></div>
       <div class="btn-row"><button class="btn btn-soft" id="pa-close">Close</button></div>`);
     m.querySelector('#pa-close').onclick = () => UI.closeModal();
@@ -259,15 +418,17 @@ const Board = {
   sellPlant(i){
     const p = S.save.board[i];
     if (!p) return;
-    let v = S.tierOf(p.f, p.t).sellCoins;
-    if (S.save.boosts.mergeValueMerges > 0){ v *= 2; S.save.boosts.mergeValueMerges--; }
+    const v = S.sellValueOf(p);
+    if (S.save.boosts.mergeValueMerges > 0) S.save.boosts.mergeValueMerges--;
     S.save.board[i] = null;
     S.addCoins(v);
     Audio.sfx('coin');
     const r = this.cellRect(i);
     FX.floatText(r.x, r.y - 10, '+' + UI.fmt(v), '#B9862F');
+    FX.hearts(r.x, r.y - 20);
     this.selected = -1;
     this.render();
+    this.renderPackets();
     Save.write(S.save);
   },
 
@@ -287,7 +448,7 @@ const Board = {
     document.dispatchEvent(new CustomEvent('bv:solarium'));
     this.selected = -1;
     this.render();
-    UI.refreshHUD();
+    Milestones.check();
     Achievements.check();
     Save.write(S.save);
   }

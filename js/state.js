@@ -32,11 +32,21 @@ const S = {
   },
 
   solariumSlotCount(){ return 6 + (this.effect('solariumSlotsBonus', 0) || 0); },
-  spawnerCooldownSec(fid){
-    const base = this.family(fid).spawnerCooldownSec;
-    return Math.round(base * (this.effect('spawnerCooldownMult', 1) || 1));
+  gridSize(){ return S.save.gridSize || 4; },
+  gardenLevel(){ return 1 + Math.floor((S.save.stats.merges || 0) / 20); },
+  seedCost(fid){
+    const base = this.family(fid).seedBase || 5;
+    const mult = this.effect('seedCostMult', 1) || 1;
+    return Math.max(1, Math.round(base * (1 + 0.06 * (this.gardenLevel() - 1)) * mult));
   },
-
+  hapMult(){ return this.effect('happinessGainMult', 1) || 1; },
+  sellValueOf(p){
+    if (!p) return 0;
+    let v = this.tierOf(p.f, p.t).sellCoins;
+    if (p.hap >= 80) v = Math.round(v * 1.25);
+    if (S.save.boosts.mergeValueMerges > 0) v *= 2;
+    return v;
+  },
   /* ---------- economy ---------- */
   dewPerSecond(){
     let rate = 0;
@@ -48,8 +58,13 @@ const S = {
       if (!p) continue;
       const t = this.tierOf(p.f, p.t);
       let r = t.dewPerSec * spr * pots * allM;
+      if (p.hap >= 80) r *= 1.1;
       if (p.f === 'crystal-succulents') r *= sucM;
       rate += r;
+    }
+    for (const h of this.save.hybrids){
+      if (!h) continue;
+      rate += h.dewPerSec * allM;
     }
     if (this.save.boosts.dewBoostUntil > Date.now()) rate *= 2;
     return rate;
@@ -87,7 +102,8 @@ const S = {
   takePlants(fid, tier, n){
     // removes n matching plants from board (lowest indices first), returns taken count
     let taken = 0;
-    for (let i = 0; i < 25 && taken < n; i++){
+    const len = this.save.board.length;
+    for (let i = 0; i < len && taken < n; i++){
       const c = this.save.board[i];
       if (c && c.f === fid && c.t === tier){ this.save.board[i] = null; taken++; }
     }

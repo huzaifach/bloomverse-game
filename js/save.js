@@ -1,22 +1,25 @@
-/* BLOOMVERSE — versioned localStorage save. Atomic writes + backup + migrations. */
+/* BLOOMVERSE V2 — versioned localStorage save. Atomic writes + backup + migrations. */
 const Save = {
-  KEY: 'bloomverse.save.v1',
-  BACKUP_KEY: 'bloomverse.save.v1.bak',
-  VERSION: 1,
+  KEY: 'bloomverse.save.v2',
+  BACKUP_KEY: 'bloomverse.save.v2.bak',
+  VERSION: 2,
 
   defaults(){
     return {
       version: this.VERSION,
-      board: new Array(25).fill(null),
+      gridSize: 4,
+      board: new Array(16).fill(null),
       solarium: new Array(8).fill(null),
-      coins: 60, dewdrops: 0, renown: 0, seeds: 1,
+      hybrids: [null, null],
+      coins: 150, dewdrops: 0, renown: 0, seeds: 2,
       upgrades: { sprinkler: 0, butterflies: 0, pots: 0 },
       rooms: ['potting-shed'],
       codex: {},
       orders: [],
       orderStreak: 0, bestStreak: 0,
-      spawners: {},
       boosts: { dewBoostUntil: 0, mergeValueMerges: 0 },
+      bloomBurstAt: 0,
+      milestones: [],
       achievements: [],
       daily: { lastClaim: '', streak: 0 },
       share: { lastShare: '' },
@@ -32,7 +35,6 @@ const Save = {
 
   load(){
     const d = this.defaults();
-    // codex needs family ids — filled after DATA loads; init lazily in app.js
     let raw = null;
     try { raw = localStorage.getItem(this.KEY); } catch(e){}
     if (!raw) return d;
@@ -50,13 +52,11 @@ const Save = {
   },
 
   migrate(s){
-    // chain of single-step pure migrations; never edited after shipping
-    if (!s.version || s.version < 1) s.version = 1;
+    if (!s.version || s.version < 2){ s.version = 2; } // v1 saves are not carried over (full V2 reset)
     return s;
   },
 
   mergeDefaults(d, s){
-    // additive merge: saved fields win, missing fields fall back to defaults
     const out = Object.assign({}, d, s);
     out.upgrades = Object.assign({}, d.upgrades, s.upgrades || {});
     out.boosts = Object.assign({}, d.boosts, s.boosts || {});
@@ -64,11 +64,15 @@ const Save = {
     out.share = Object.assign({}, d.share, s.share || {});
     out.stats = Object.assign({}, d.stats, s.stats || {});
     out.settings = Object.assign({}, d.settings, s.settings || {});
-    if (!Array.isArray(out.board) || out.board.length !== 25) out.board = d.board;
+    const n = (out.gridSize >= 4 && out.gridSize <= 8) ? out.gridSize : 4;
+    out.gridSize = n;
+    if (!Array.isArray(out.board) || out.board.length !== n * n) out.board = new Array(n * n).fill(null);
     if (!Array.isArray(out.solarium) || out.solarium.length !== 8) out.solarium = d.solarium;
+    if (!Array.isArray(out.hybrids) || out.hybrids.length !== 2) out.hybrids = d.hybrids;
     if (!Array.isArray(out.rooms)) out.rooms = d.rooms;
     if (!Array.isArray(out.orders)) out.orders = [];
     if (!Array.isArray(out.achievements)) out.achievements = [];
+    if (!Array.isArray(out.milestones)) out.milestones = [];
     if (typeof out.codex !== 'object' || !out.codex) out.codex = {};
     return out;
   },

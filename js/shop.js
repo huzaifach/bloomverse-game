@@ -38,7 +38,7 @@ const Shop = {
   },
 
   ico(id){
-    return { 'sunlight-burst': '☀️', 'fertilizer': '🌟', 'seed-bundle': '🌰', 'golden-trowel': '🪙' }[id] || '🎁';
+    return { 'sunlight-burst': '☀️', 'joyful-rain': '🌈', 'seed-bundle': '🌰', 'golden-trowel': '🪙' }[id] || '🎁';
   },
 
   buy(id){
@@ -51,10 +51,13 @@ const Shop = {
     if (e.type === 'dewBoost'){
       S.save.boosts.dewBoostUntil = Date.now() + e.durationMin * 60000;
       UI.banner('☀️ Sunlight Burst! 2× Dewdrops for 10 min');
-    } else if (e.type === 'refreshSpawners'){
-      for (const f of S.data.families) S.save.spawners[f.id] = 0;
-      Board.renderPackets();
-      UI.toast('✨ All seed packets refreshed!');
+    } else if (e.type === 'joyfulRain'){
+      let n = 0;
+      for (const p of S.save.board){ if (p){ p.hap = 100; n++; } }
+      Board.render();
+      FX.burst(innerWidth / 2, innerHeight * 0.4, 30, { color: '#FF6B9D' });
+      Pip.say('Wheee! Everyone is SO happy now!', 'cheer', 3000);
+      UI.toast(`🌈 Joyful Rain! ${n} plants are overjoyed!`);
     } else if (e.type === 'addSeeds'){
       S.addSeeds(e.count);
       UI.toast(`🌰 +${e.count} Mystery Seeds!`);

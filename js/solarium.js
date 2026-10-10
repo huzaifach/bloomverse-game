@@ -1,4 +1,5 @@
-/* BLOOMVERSE — the Solarium: idle Dewdrop garden, upgrades, butterfly bubbles. */
+/* BLOOMVERSE V2 — the Solarium: idle Dewdrop garden, decorative pots, upgrades,
+   butterfly bubbles, and the Hybrid Lab (cross-breeding). */
 const Solarium = {
   UPGRADES: [
     { key: 'sprinkler', name: 'Sprinklers', ico: '💧', desc: '+20% Dewdrop yield per level', max: 5, cost: l => Math.round(150 * Math.pow(3, l)) },
@@ -14,6 +15,7 @@ const Solarium = {
     const rate = S.dewPerSecond();
     document.getElementById('dew-rate').textContent = '💧 ' + rate.toFixed(1) + '/s';
     this.renderMeadow();
+    this.renderHybridZone();
     this.renderSlots();
     this.renderUpgrades();
   },
@@ -22,11 +24,10 @@ const Solarium = {
     const meadow = document.getElementById('butterfly-meadow');
     meadow.querySelectorAll('.butterfly').forEach(b => b.remove());
     const n = S.save.upgrades.butterflies;
-    const icons = ['🦋', '🦋', '🦋', '🦋', '🦋'];
     for (let i = 0; i < n; i++){
       const b = document.createElement('div');
       b.className = 'butterfly';
-      b.textContent = icons[i % icons.length];
+      b.textContent = '🦋';
       b.style.left = (8 + Math.random() * 78) + '%';
       b.style.top = (8 + Math.random() * 55) + '%';
       b.style.animationDelay = (Math.random() * 7) + 's';
@@ -39,6 +40,116 @@ const Solarium = {
       hint.textContent = 'Buy Butterflies below to fill this meadow';
       meadow.appendChild(hint);
     }
+  },
+
+  /* ---------- Hybrid Lab (cross-breeding) ---------- */
+  renderHybridZone(){
+    let zone = document.getElementById('hybrid-zone');
+    if (!zone){
+      zone = document.createElement('div');
+      zone.id = 'hybrid-zone';
+      zone.className = 'hybrid-zone';
+      document.getElementById('solarium-slots').before(zone);
+    }
+    zone.innerHTML = '';
+    if (!S.hasRoom('astral-solarium')) return;
+    const title = document.createElement('h3');
+    title.className = 'section-title';
+    title.textContent = '🔮 Hybrid Lab — cross-breed two Tier 5+ plants of different families!';
+    zone.appendChild(title);
+    const ped = document.createElement('div');
+    ped.className = 'hybrid-ped';
+    S.save.hybrids.forEach((h, i) => {
+      const slot = document.createElement('div');
+      slot.className = 'hybrid-slot';
+      if (h){
+        slot.innerHTML = `<img src="${S.artFor(h.baseF, h.baseT)}" style="filter:hue-rotate(${h.hue}deg)" alt="${h.name}">
+          <div style="font-weight:800">${h.name}</div>
+          <div>💧 ${h.dewPerSec.toFixed(1)}/s</div>`;
+        slot.title = `A cross-breed of ${h.parents.join(' × ')}`;
+      } else {
+        slot.innerHTML = `<div style="font-size:26px">💜</div><div>Empty pedestal</div>
+          <button class="btn btn-small" style="margin-top:6px" id="hyb-btn-${i}">Fuse Plants</button>`;
+      }
+      ped.appendChild(slot);
+    });
+    zone.appendChild(ped);
+    S.save.hybrids.forEach((h, i) => {
+      if (!h){
+        const b = document.getElementById(`hyb-btn-${i}`);
+        if (b) b.onclick = () => this.fuseDialog(i);
+      }
+    });
+  },
+
+  eligibleParents(){
+    const out = [];
+    S.save.board.forEach((p, i) => {
+      if (p && p.t >= 5) out.push({ i, p });
+    });
+    return out;
+  },
+
+  fuseDialog(slotIx){
+    const elig = this.eligibleParents();
+    if (elig.length < 2){
+      Audio.sfx('error');
+      UI.toast('You need two Tier 5+ plants in the Garden to cross-breed.');
+      return;
+    }
+    const fams = [...new Set(elig.map(e => e.p.f))];
+    if (fams.length < 2){
+      Audio.sfx('error');
+      UI.toast('Parents must be from two DIFFERENT families!');
+      return;
+    }
+    const list = elig.map(e => {
+      const t = S.tierOf(e.p.f, e.p.t);
+      return `<label class="order-item" style="cursor:pointer"><input type="checkbox" data-pick="${e.i}" style="width:18px;height:18px">
+        <img src="${S.artFor(e.p.f, e.p.t)}"><span>${t.name} (T${e.p.t})</span></label>`;
+    }).join('');
+    const m = UI.modal(`<h2>🔮 Choose Two Parents</h2>
+      <p style="text-align:center;font-weight:600">Two Tier 5+ plants from <b>different families</b>.<br>They'll become one magical hybrid!</p>
+      <div class="order-items">${list}</div>
+      <div class="btn-row"><button class="btn btn-soft" id="hyb-cancel">Cancel</button>
+      <button class="btn" id="hyb-fuse">Fuse! 💜</button></div>`);
+    m.querySelector('#hyb-cancel').onclick = () => UI.closeModal();
+    m.querySelector('#hyb-fuse').onclick = () => {
+      const picks = [...m.querySelectorAll('[data-pick]:checked')].map(c => parseInt(c.dataset.pick, 10));
+      if (picks.length !== 2){ UI.toast('Pick exactly two plants!'); return; }
+      const a = S.save.board[picks[0]], b = S.save.board[picks[1]];
+      if (!a || !b || a.f === b.f){ UI.toast('Parents must be from two different families!'); return; }
+      UI.closeModal();
+      this.doFuse(slotIx, picks[0], picks[1]);
+    };
+  },
+
+  doFuse(slotIx, ia, ib){
+    const a = S.save.board[ia], b = S.save.board[ib];
+    if (!a || !b) return;
+    const ta = S.tierOf(a.f, a.t), tb = S.tierOf(b.f, b.t);
+    const dew = Math.round(((ta.dewPerSec + tb.dewPerSec) * 1.5) * 10) / 10;
+    const hue = (Math.random() * 360) | 0;
+    const names = ['Prismatic Fusion', 'Starbloom Hybrid', 'Rainbow Cross', 'Twilight Bloom', 'Aurora Sprout'];
+    const h = {
+      name: names[(Math.random() * names.length) | 0],
+      baseF: a.f, baseT: Math.min(a.t, b.t), hue, dewPerSec: dew,
+      parents: [ta.name, tb.name], bornAt: Date.now()
+    };
+    S.save.board[ia] = null; S.save.board[ib] = null;
+    S.save.hybrids[slotIx] = h;
+    Audio.sfx('fanfare');
+    FX.burst(innerWidth / 2, innerHeight * 0.35, 40, { color: '#C77DFF' });
+    UI.banner(`💜 A wild ${h.name} is born! 💜`);
+    Pip.say(S.data.pip.hybrid[(Math.random() * S.data.pip.hybrid.length) | 0], 'cheer', 4000);
+    UI.toast(`${h.name} earns 💧${dew}/s on its pedestal!`);
+    document.dispatchEvent(new CustomEvent('bv:hybrid'));
+    this.render();
+    UI.refreshHUD();
+    Board.render();
+    Milestones.check();
+    Achievements.check();
+    Save.write(S.save);
   },
 
   renderSlots(){
@@ -55,7 +166,9 @@ const Solarium = {
       } else if (p){
         slot.className = 'slot filled';
         const t = S.tierOf(p.f, p.t);
-        slot.innerHTML = `<img src="${S.artFor(p.f, p.t)}" alt="${t.name}" draggable="false"><span class="slot-x" data-unslot="${i}">✕</span>`;
+        slot.innerHTML = `<div class="pot"></div>
+          <img class="plant-img" src="${S.artFor(p.f, p.t)}" alt="${t.name}" draggable="false">
+          <span class="slot-x" data-unslot="${i}">✕</span>`;
         slot.title = `${t.name} — ${t.dewPerSec}/s base`;
         slot.addEventListener('click', e => {
           if (e.target.closest('[data-unslot]')){ e.stopPropagation(); this.unslot(i); return; }
@@ -148,7 +261,6 @@ const Solarium = {
   tick(){
     const lvl = S.save.upgrades.butterflies;
     if (lvl <= 0) return;
-    // expire old bubbles
     const now = Date.now();
     this.bubbles = this.bubbles.filter(b => {
       if (now > b.expires){ b.el.remove(); return false; }
