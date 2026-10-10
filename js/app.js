@@ -65,10 +65,11 @@ const App = {
     Board.init();
     Solarium.init();
     Orders.init();
-    Codex.refresh();
+    Events.init();
     Rooms.render();
     Shop.render();
     Achievements.render();
+    Prestige.render();
     UI.refreshHUD();
     UI.refreshSoundIcon();
     UI.updateBadges();
@@ -205,6 +206,7 @@ const App = {
     S.save.stats.playtimeSec++;
     Solarium.tick();
     Orders.tick();
+    Events.tick();
     Board.renderPackets();
     const dewEl = document.getElementById('pill-dew');
     if (dewEl) dewEl.innerHTML = UI.ICONS.dew + '<span>' + UI.fmt(S.save.dewdrops) + '</span>';

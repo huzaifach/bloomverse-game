@@ -37,14 +37,16 @@ const S = {
   seedCost(fid){
     const base = this.family(fid).seedBase || 5;
     const mult = this.effect('seedCostMult', 1) || 1;
-    return Math.max(1, Math.round(base * (1 + 0.06 * (this.gardenLevel() - 1)) * mult));
+    return Math.max(1, Math.round(base * (1 + 0.09 * (this.gardenLevel() - 1)) * mult));
   },
   hapMult(){ return this.effect('happinessGainMult', 1) || 1; },
   sellValueOf(p){
     if (!p) return 0;
     let v = this.tierOf(p.f, p.t).sellCoins;
+    if (p.golden) v *= 3;
     if (p.hap >= 80) v = Math.round(v * 1.25);
     if (S.save.boosts.mergeValueMerges > 0) v *= 2;
+    v = Math.round(v * (typeof Prestige !== 'undefined' ? Prestige.coinMult() : 1));
     return v;
   },
   /* ---------- economy ---------- */
@@ -58,7 +60,9 @@ const S = {
       if (!p) continue;
       const t = this.tierOf(p.f, p.t);
       let r = t.dewPerSec * spr * pots * allM;
+      if (p.golden) r *= 2;
       if (p.hap >= 80) r *= 1.1;
+      r *= (typeof Prestige !== 'undefined' ? Prestige.dewMult() : 1);
       if (p.f === 'crystal-succulents') r *= sucM;
       rate += r;
     }

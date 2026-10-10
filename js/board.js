@@ -29,12 +29,16 @@ const Board = {
       const p = S.save.board[i];
       if (p){
         cell.classList.add('filled');
+        if (p.weed){
+          cell.innerHTML = `<div class="weed-plant" data-i="${i}">🌿</div>`;
+        } else {
         if (p.hap >= 80) cell.classList.add('joyful');
         const t = S.tierOf(p.f, p.t);
         const delay = (-(i * 0.7) % 3.8).toFixed(2);
-        cell.innerHTML = `<div class="plant" data-i="${i}">
+        cell.innerHTML = `<div class="plant${p.golden ? ' golden' : ''}" data-i="${i}">
             <img src="${S.artFor(p.f, p.t)}" alt="${t.name}" draggable="false" style="animation-delay:${delay}s">
             <span class="tier-badge">${p.t}</span></div>`;
+        }
         if (i === this.selected) cell.classList.add('selected');
       }
       grid.appendChild(cell);
@@ -46,7 +50,7 @@ const Board = {
         for (let i = 0; i < n * n; i++){
           if (i === this.selected) continue;
           const p = S.save.board[i];
-          if (p && p.f === s.f && p.t === s.t){
+          if (p && !p.weed && p.f === s.f && p.t === s.t){
             const c = grid.children[i];
             if (c) c.classList.add('merge-hint');
           }
@@ -115,6 +119,10 @@ const Board = {
   },
 
   renderPackets(){
+    // perf: only rebuild when affordability changes (called every tick)
+    const sig = S.data.families.map(f => (S.isFamilyUnlocked(f.id) ? '1' : '0') + (S.save.coins >= S.seedCost(f.id) ? '1' : '0')).join('');
+    if (sig === this._packetSig) return;
+    this._packetSig = sig;
     const row = document.getElementById('packet-row');
     row.innerHTML = '';
     for (const f of S.data.families){
@@ -162,6 +170,7 @@ const Board = {
     S.save.board[cell] = { f: fid, t: 1, hap: 20 };
     S.discover(fid, 1);
     S.save.stats.sprouts++;
+    Challenge.bump('plant');
     Audio.sfx('sprout');
     this.selected = -1;
     this.render(); this.renderPackets();
@@ -237,6 +246,10 @@ const Board = {
     Audio.sfx('click');
     if (this.selected === -1){
       if (S.save.board[i]){
+        if (S.save.board[i].weed){
+          UI.toast('🌿 A weed! Drag two weeds together to clear them.');
+          return;
+        }
         this.selected = i;
         const cellEl = document.querySelector(`.cell[data-i="${i}"] .plant`);
         if (cellEl){ cellEl.classList.remove('giggle'); void cellEl.offsetWidth; cellEl.classList.add('giggle'); }
@@ -283,10 +296,24 @@ const Board = {
   resolveDrop(from, to){
     const a = S.save.board[from], b = S.save.board[to];
     if (!a){ this.render(); return; }
+    // weeds: drag two weeds together to clear them
+    if (a.weed && b && b.weed){
+      S.save.board[from] = null; S.save.board[to] = null;
+      const reward = Math.round(120 * S.gardenLevel() * Prestige.coinMult());
+      S.addCoins(reward);
+      FX.burst(innerWidth / 2, innerHeight / 2, 16, { color: '#6BCB77' });
+      FX.floatText(innerWidth / 2, innerHeight / 2 - 40, `Weeds cleared! +${UI.fmt(reward)} 🪙`, '#2E7D32');
+      Audio.sfx('merge');
+      Pip.say('Weeds gone! The garden can breathe again!', 'cheer', 2500);
+      this.selected = -1;
+      this.render();
+      Save.write(S.save);
+      return;
+    }
     if (!b){
       S.save.board[to] = a; S.save.board[from] = null;
       Audio.sfx('drop');
-    } else if (a.f === b.f && a.t === b.t && a.t < 8){
+    } else if (!a.weed && !b.weed && a.f === b.f && a.t === b.t && a.t < 8){
       this.doMerge(from, to);
       return;
     } else {
@@ -308,8 +335,25 @@ const Board = {
     const comboN = this.combo.n;
 
     const newHap = Math.min(100, Math.max(a.hap || 0, 40) + Math.round(nt * 4 * S.hapMult()));
-    S.save.board[to] = { f: a.f, t: nt, hap: newHap };
+    // rainbow rain buff: next N merges are golden
+    let golden;
+    if ((S.save.boosts.rainbowMerges || 0) > 0){
+      golden = true;
+      S.save.boosts.rainbowMerges--;
+    } else {
+      // golden surprise: 3% of merges produce a rare golden plant (3x value)
+      golden = Math.random() < 0.03;
+    }
+    S.save.board[to] = { f: a.f, t: nt, hap: newHap, golden: golden || undefined };
     S.save.board[from] = null;
+    if (golden){
+      S.save.stats.goldenMerges = (S.save.stats.goldenMerges || 0) + 1;
+      UI.banner('🌟 GOLDEN PLANT! 🌟<br><span style="font-size:15px">Worth 3× coins!</span>');
+      Audio.sfx('fanfare');
+      Challenge.bump('golden');
+    }
+    Challenge.bump('merges');
+    Challenge.bump('mergesFam', a.f);
     // neighbors feel the joy
     const n = this.size();
     const fx = to % n, fy = (to / n) | 0;
@@ -365,7 +409,7 @@ const Board = {
     const seen = {};
     for (let i = 0; i < b.length; i++){
       const p = b[i];
-      if (!p || p.t >= 8) continue;
+      if (!p || p.weed || p.t >= 8) continue;
       const k = p.f + ':' + p.t;
       if (seen[k] !== undefined) return [seen[k], i];
       seen[k] = i;
@@ -377,6 +421,8 @@ const Board = {
     const pair = this.findMergePair();
     if (pair === -1){ UI.toast('No merges available right now.'); return; }
     S.save.bloomBurstAt = Date.now();
+    S.save.stats.bursts = (S.save.stats.bursts || 0) + 1;
+    Challenge.bump('bursts');
     Audio.sfx('fanfare');
     UI.banner('💥 BLOOM BURST! 💥');
     Pip.say('WATCH THIS! Everything merges at ONCE!', 'cheer', 3000);

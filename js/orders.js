@@ -21,6 +21,8 @@ const Orders = {
   },
 
   generate(){
+    // grand orders unlock at Garden Level 10: huge demands, huge rewards
+    if (S.gardenLevel() >= 10 && Math.random() < 0.18) return this.generateGrand();
     const tpl = this.pickTemplate();
     const g = S.data.orders.generator;
     const unlocked = S.unlockedFamilies().filter(f => tpl.families.includes(f.id));
@@ -43,7 +45,7 @@ const Orders = {
       if (it.f === 'crystal-succulents') v *= succM; // Crystal Cave room bonus
       coins += v;
     }
-    coins = Math.round(coins * tpl.reward.coinsMult * mult);
+    coins = Math.round(coins * tpl.reward.coinsMult * mult * Prestige.coinMult());
     const renown = Math.round((tpl.reward.renownMin + Math.random() * (tpl.reward.renownMax - tpl.reward.renownMin)) * mult);
     const dewdrops = Math.round(tpl.reward.dewdrops * mult);
     const seeds = Math.random() < tpl.reward.mysterySeedChance * mult ? 1 : 0;
@@ -54,6 +56,31 @@ const Orders = {
       items,
       rewards: { coins, renown, dewdrops, seeds },
       vip,
+      expiresAt: Date.now() + S.data.orders.generator.rerollMinutes * 60 * 1000
+    };
+  },
+
+  generateGrand(){
+    const fams = S.unlockedFamilies();
+    const items = [];
+    for (let i = 0; i < 2; i++){
+      const f = fams[(Math.random() * fams.length) | 0];
+      const t = 5 + ((Math.random() * 3) | 0); // tier 5-7
+      const ex = items.find(x => x.f === f.id && x.t === t);
+      if (ex) ex.n++;
+      else items.push({ f: f.id, t, n: 1 });
+    }
+    let coins = 0;
+    for (const it of items) coins += S.tierOf(it.f, it.t).orderValue * it.n;
+    coins = Math.round(coins * 4 * Prestige.coinMult());
+    const renown = 8 + ((Math.random() * 8) | 0);
+    const visitors = S.data.orders.visitors;
+    return {
+      uid: 'o' + (this.uidc++) + Date.now().toString(36),
+      visitor: '👑 ' + visitors[(Math.random() * visitors.length) | 0],
+      items,
+      rewards: { coins, renown, dewdrops: Math.round(coins / 4), seeds: 2 },
+      vip: true, grand: true,
       expiresAt: Date.now() + S.data.orders.generator.rerollMinutes * 60 * 1000
     };
   },
@@ -75,6 +102,8 @@ const Orders = {
     S.save.orderStreak++;
     S.save.bestStreak = Math.max(S.save.bestStreak, S.save.orderStreak);
     S.save.stats.orders++;
+    if (o.grand) S.save.stats.grandOrders = (S.save.stats.grandOrders || 0) + 1;
+    Challenge.bump('orders');
     // streak bonus every 3
     let bonus = '';
     if (S.save.orderStreak % 3 === 0){
@@ -157,7 +186,7 @@ const Orders = {
     document.getElementById('order-streak').textContent = '🔥 Streak: ' + S.save.orderStreak;
     for (const o of S.save.orders){
       const card = document.createElement('div');
-      card.className = 'card order-card' + (o.vip ? ' vip' : '');
+      card.className = 'card order-card' + (o.vip ? ' vip' : '') + (o.grand ? ' grand' : '');
       card.dataset.uid = o.uid;
       const itemsHtml = o.items.map(it => {
         const t = S.tierOf(it.f, it.t);
@@ -166,7 +195,8 @@ const Orders = {
           <img src="${S.artFor(it.f, it.t)}" draggable="false">${it.n}× ${t.name}</div>`;
       }).join('');
       const rw = o.rewards;
-      card.innerHTML = `<div class="order-visitor">${o.visitor} ${o.vip ? '👑' : ''}</div>
+      card.innerHTML = `<div class="order-visitor">${o.visitor} ${o.grand ? '👑👑' : o.vip ? '👑' : ''}</div>
+        ${o.grand ? '<div class="grand-tag">GRAND ORDER — huge reward!</div>' : ''}
         <div style="font-size:12px;color:var(--muted);font-weight:600">wishes for…</div>
         <div class="order-items">${itemsHtml}</div>
         <div class="order-rewards"><span>🪙 ${UI.fmt(rw.coins)}</span><span>⭐ +${rw.renown}</span>

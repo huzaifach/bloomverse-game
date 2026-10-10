@@ -42,8 +42,15 @@ const FX = {
     for (let i = 0; i < n; i++) this.spawn(x, y, opts);
   },
 
+  /* rainbow drops across the screen */
+  rainbow(){
+    for (let i = 0; i < 40; i++){
+      setTimeout(() => this.burst(Math.random() * innerWidth, Math.random() * innerHeight * 0.5,
+        3, { color: ['#FF6B6B', '#FFC93C', '#6BCB77', '#4FC3F7', '#B388EB'][i % 5] }), i * 40);
+    }
+  },
+
   floatText(x, y, text, color = '#6E8F6A'){
-    if (this.reduced) { UI.toast(text); return; }
     const el = document.createElement('div');
     el.className = 'float-text'; el.textContent = text;
     el.style.left = x + 'px'; el.style.top = y + 'px';

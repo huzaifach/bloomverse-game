@@ -28,8 +28,8 @@ const UI = {
     window.scrollTo(0, 0);
     if (name === 'solarium') Solarium.render();
     if (name === 'orders') Orders.render();
-    if (name === 'codex') Codex.refresh();
-    if (name === 'haven'){ Rooms.render(); Shop.render(); Achievements.render(); }
+    if (name === 'goals') Milestones.render();
+    if (name === 'haven'){ Rooms.render(); Shop.render(); Achievements.render(); Prestige.render(); }
     if (name === 'board') Board.render();
   },
 
@@ -93,6 +93,20 @@ const UI = {
     let daily = 0;
     try { daily = (Daily.dayStr() !== (S.save.daily.lastClaim || '')) ? 1 : 0; } catch(e){}
     set('haven', daily);
+    // goals: claimable milestones + completable daily challenge
+    let gr = 0;
+    try {
+      gr = (S.save.milestonesReady || []).length;
+      const ch = S.save.challenge || {};
+      if (ch.date && ch.progress >= ch.target && !ch.claimed) gr++;
+    } catch(e){}
+    set('goals', gr);
+    const gp = document.getElementById('goals-pct');
+    if (gp){
+      const total = (S.data.milestones || []).length;
+      const done = (S.save.milestones || []).length;
+      gp.textContent = total ? `${done}/${total} claimed` : '';
+    }
   },
 
   refreshSoundIcon(){
@@ -129,6 +143,7 @@ const UI = {
     const root = document.getElementById('modal-root');
     root.innerHTML = '<div class="modal">' + html + '</div>';
     root.classList.add('open');
+    this.modalOpen = true;
     if (dismiss){
       root.onclick = e => { if (e.target === root) this.closeModal(); };
     } else root.onclick = null;
@@ -138,6 +153,7 @@ const UI = {
   closeModal(){
     const root = document.getElementById('modal-root');
     root.classList.remove('open'); root.innerHTML = '';
+    this.modalOpen = false;
     const fn = this.modalQueue.shift();
     if (fn) setTimeout(fn, 200);
   },
@@ -199,6 +215,7 @@ const Seeds = {
     S.save.board[cell] = { f: f.id, t };
     S.discover(f.id, t);
     S.save.stats.sprouts++;
+    Challenge.bump('plant');
     Audio.sfx('sprout');
     Board.render();
     UI.refreshHUD();

@@ -84,7 +84,9 @@ body::after{top:16%;left:-140px;font-size:44px;animation-duration:70s;animation-
 @keyframes floatY{50%{transform:translateY(-5px)}}
 .plant{width:100%;height:100%;display:flex;align-items:center;justify-content:center;cursor:grab;position:relative}
 .plant img{width:88%;height:88%;object-fit:contain;pointer-events:none;
-  animation:sway 2.8s ease-in-out infinite;transform-origin:50% 92%;filter:drop-shadow(0 3px 2px rgba(46,110,32,.25))}
+  animation:sway 2.8s ease-in-out infinite;transform-origin:50% 92%;will-change:transform}
+.plant.golden img{filter:brightness(1.12) sepia(.55) saturate(2.6) hue-rotate(-12deg)}
+.plant.golden::before{content:'✨';position:absolute;top:-4px;left:2px;font-size:16px;z-index:3;animation:floatY 1.4s ease-in-out infinite}
 @keyframes sway{0%,100%{transform:rotate(-7deg) translateY(0)}50%{transform:rotate(7deg) translateY(-5px)}}
 .cell.merge-hint{outline:4px solid var(--sun);animation:hintPulse .9s infinite;z-index:2}
 @keyframes hintPulse{0%,100%{box-shadow:0 0 4px var(--sun);transform:scale(1)}50%{box-shadow:0 0 20px var(--sun);transform:scale(1.07)}}
@@ -92,6 +94,21 @@ body::after{top:16%;left:-140px;font-size:44px;animation-duration:70s;animation-
 .tab-badge{position:absolute;top:2px;right:8px;background:#FF5252;color:#fff;font-size:11px;font-weight:800;
   border-radius:999px;min-width:20px;height:20px;display:flex;align-items:center;justify-content:center;
   border:2px solid #fff;box-shadow:0 2px 4px rgba(0,0,0,.25);padding:0 4px}
+.goal-card{display:flex;align-items:center;gap:10px}
+.goal-card .u-ico{font-size:26px}
+.goal-card .u-body{flex:1}
+.goal-card .u-name{font-weight:800}
+.goal-card .u-desc{font-size:12px;color:var(--muted)}
+.goal-ready{border-color:var(--sun);background:#FFF8E1;animation:hintPulse 1.6s infinite}
+.goal-done{opacity:.75}
+.goal-bar{height:8px;background:#E8DCC3;border-radius:99px;margin-top:6px;overflow:hidden}
+.goal-fill{height:100%;background:linear-gradient(90deg,var(--leaf),var(--sun));border-radius:99px;transition:width .4s}
+.grand-tag{font-size:11px;font-weight:800;color:#B9862F;background:#FFF3D6;border-radius:99px;
+  padding:2px 10px;display:inline-block;margin:2px 0 6px}
+.order-card.grand{border-color:#FFC93C;background:linear-gradient(180deg,#FFFDF5,#FFF6DC)}
+.event-butterfly{position:absolute;font-size:30px;animation:flyUp linear forwards;cursor:pointer;z-index:75}
+@keyframes flyUp{from{transform:translateY(0) rotate(-10deg)}to{transform:translateY(-130vh) rotate(10deg)}}
+.weed-plant{font-size:44px;text-align:center;animation:sway 2.2s ease-in-out infinite;transform-origin:50% 90%;cursor:pointer}
 .plant.spawn img{animation:popIn .45s cubic-bezier(.2,1.6,.4,1)}
 @keyframes popIn{from{transform:scale(0) rotate(-30deg)}}
 .plant.pop img{animation:mergePop .55s cubic-bezier(.2,1.8,.4,1)}
@@ -118,8 +135,9 @@ body::after{top:16%;left:-140px;font-size:44px;animation-duration:70s;animation-
 #drag-ghost img{width:74px;height:74px;object-fit:contain}
 
 /* ---------- Pip companion ---------- */
-#pip{position:fixed;right:8px;bottom:86px;z-index:60;width:86px;text-align:center;cursor:pointer}
-#pip img{width:76px;height:76px;object-fit:contain;animation:pipBob 2.6s ease-in-out infinite;filter:drop-shadow(0 4px 4px rgba(0,0,0,.2))}
+#pip{position:fixed;right:6px;bottom:78px;z-index:60;width:70px;text-align:center;cursor:pointer;pointer-events:none}
+#pip img{width:62px;height:62px;object-fit:contain;animation:pipBob 2.6s ease-in-out infinite;pointer-events:auto;will-change:transform}
+#pip-bubble{pointer-events:none}
 @keyframes pipBob{50%{transform:translateY(-9px) rotate(4deg)}}
 #pip-bubble{position:absolute;bottom:calc(100% + 4px);right:0;width:210px;background:#fff;border:3px solid #BEE39A;border-radius:16px;
   padding:8px 11px;font-size:13px;font-weight:700;line-height:1.35;box-shadow:0 5px 14px rgba(0,0,0,.18);display:none;text-align:left;color:var(--ink)}
