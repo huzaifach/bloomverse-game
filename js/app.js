@@ -5,16 +5,16 @@ const App = {
   async boot(){
     try {
       const [families, orders, rooms, achievements, shop, daily, expansions, milestones, pip, giggles] = await Promise.all([
-        fetch('data/families.json').then(r => r.json()),
-        fetch('data/orders.json').then(r => r.json()),
-        fetch('data/rooms.json').then(r => r.json()),
-        fetch('data/achievements.json').then(r => r.json()),
-        fetch('data/shop.json').then(r => r.json()),
-        fetch('data/daily.json').then(r => r.json()),
-        fetch('data/expansions.json').then(r => r.json()),
-        fetch('data/milestones.json').then(r => r.json()),
-        fetch('data/pip.json').then(r => r.json()),
-        fetch('data/giggles.json').then(r => r.json())
+        fetch('data/families.json?v=7').then(r => r.json()),
+        fetch('data/orders.json?v=7').then(r => r.json()),
+        fetch('data/rooms.json?v=7').then(r => r.json()),
+        fetch('data/achievements.json?v=7').then(r => r.json()),
+        fetch('data/shop.json?v=7').then(r => r.json()),
+        fetch('data/daily.json?v=7').then(r => r.json()),
+        fetch('data/expansions.json?v=7').then(r => r.json()),
+        fetch('data/milestones.json?v=7').then(r => r.json()),
+        fetch('data/pip.json?v=7').then(r => r.json()),
+        fetch('data/giggles.json?v=7').then(r => r.json())
       ]);
       S.data = {
         families: families.families,
