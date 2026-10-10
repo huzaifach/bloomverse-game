@@ -128,7 +128,7 @@ const Haven = {
         <div class="stat-cell"><div class="sv">${st.sprouts}</div><div class="sl">plants sprouted</div></div>
         <div class="stat-cell"><div class="sv">${st.merges}</div><div class="sl">merges</div></div>
         <div class="stat-cell"><div class="sv">${st.orders}</div><div class="sl">orders filled</div></div>
-        <div class="stat-cell"><div class="sv">${st.bestStreak}</div><div class="sl">best streak</div></div>
+        <div class="stat-cell"><div class="sv">${S.save.bestStreak}</div><div class="sl">best streak</div></div>
         <div class="stat-cell"><div class="sv">${st.maxTier}</div><div class="sl">highest tier</div></div>
         <div class="stat-cell"><div class="sv">${S.codexPct()}%</div><div class="sl">codex found</div></div>
         <div class="stat-cell"><div class="sv">${UI.fmt(st.lifetimeCoins)}</div><div class="sl">coins earned</div></div>

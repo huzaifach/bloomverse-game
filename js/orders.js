@@ -106,7 +106,7 @@ const Orders = {
   rerollAll(){
     const cost = S.data.orders.generator.rerollCostCoins;
     if (S.save.coins < cost){ Audio.sfx('error'); UI.toast(`Need ${cost} coins to refresh orders.`); return; }
-    UI.confirm('Refresh Orders?', `Replace all 3 orders for ${cost} coins?`, 'Refresh').then(ok => {
+    UI.confirm('Refresh Orders?', `Replace all 3 orders for ${cost} coins? This will reset your order streak.`, 'Refresh').then(ok => {
       if (!ok) return;
       S.addCoins(-cost);
       S.save.orderStreak = 0;
